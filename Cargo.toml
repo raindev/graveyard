@@ -1,0 +1,4 @@
+[package]
+name = "graveyard"
+version = "0.1.0"
+authors = ["Andrew Barchuk <andrew@raindev.io>"]
