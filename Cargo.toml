@@ -2,3 +2,6 @@
 name = "graveyard"
 version = "0.1.0"
 authors = ["Andrew Barchuk <andrew@raindev.io>"]
+
+[dev-dependencies]
+quickcheck = "0.2.*"
