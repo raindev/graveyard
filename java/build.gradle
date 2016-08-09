@@ -1,0 +1,17 @@
+apply plugin: 'java'
+
+repositories {
+  jcenter()
+}
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.14.1'
+}
+
+dependencies {
+  testCompile 'junit:junit:4.+'
+}
+
+compileJava {
+  options.compilerArgs << '-Xlint:unchecked'
+}
