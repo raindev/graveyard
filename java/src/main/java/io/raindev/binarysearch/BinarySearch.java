@@ -7,12 +7,12 @@ public class BinarySearch {
 
     static <T extends Comparable<T>> Optional<Integer> binarySearch(
             T[] sortedArray, T element) {
-        return binarySearch(sortedArray, element, 0, sortedArray.length - 1);
+        return binarySearch(sortedArray, element, 0, sortedArray.length);
     }
 
     private static <T extends Comparable<T>> Optional<Integer> binarySearch(
                     T[] arr, T elem, int start, int end) {
-        if (start > end) {
+        if (start >= end) {
             return Optional.empty();
         }
         int middle = (start + end) / 2;
@@ -23,7 +23,7 @@ public class BinarySearch {
         } else if (compare(elem, middleElem) > 0) {
             return binarySearch(arr, elem, middle + 1, end);
         } else {
-            return binarySearch(arr, elem, start, middle - 1);
+            return binarySearch(arr, elem, start, middle);
         }
     }
 
