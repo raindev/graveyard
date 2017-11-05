@@ -28,7 +28,7 @@ public class BinarySearch {
     }
 
     // null first
-    private static <T extends Comparable<T>> int compare(T x, T y) {
+    static <T extends Comparable<T>> int compare(T x, T y) {
         if (x == null) {
             if (y == null) {
                 return 0;
