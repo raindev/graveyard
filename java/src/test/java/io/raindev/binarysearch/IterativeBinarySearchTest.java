@@ -2,10 +2,10 @@ package io.raindev.binarysearch;
 
 import java.util.Optional;
 import org.junit.Test;
-import static io.raindev.binarysearch.BinarySearch.binarySearch;
+import static io.raindev.binarysearch.IterativeBinarySearch.binarySearch;
 import static org.junit.Assert.assertEquals;
 
-public class BinarySearchTest {
+public class IterativeBinarySearchTest {
     Integer[] array =  new Integer[]{null, 3, 4, 6, 7, 8, 11};
 
     @Test public void findExisting() {
