@@ -1,0 +1,23 @@
+name:                haskell
+version:             0.1.0.0
+synopsis:            Algorithms implementations, algorithmic problems solutions and other experiments
+homepage:            gitlab.com/raindev/graveyard
+license:             BSD2
+author:              Andrew Barchuk
+maintainer:          andrew@raindev.io
+build-type:          Simple
+cabal-version:       >=1.24
+
+library
+  exposed-modules:     Algo.Print
+  build-depends:       base >=4.9
+  default-language:    Haskell2010
+
+test-suite tests
+  type: exitcode-stdio-1.0
+  main-is: Algo/PrintSpec.hs
+  build-depends:       base >=4.9,
+                       haskell,
+                       hspec ==2.*
+  default-language:    Haskell2010
+  ghc-options:         -Wall

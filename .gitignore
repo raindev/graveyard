@@ -8,3 +8,8 @@ build/
 # Gradle Wrapper
 gradle/
 gradlew*
+
+# Haskell
+.cabal-sandbox/
+dist/
+cabal.sandbox.config
