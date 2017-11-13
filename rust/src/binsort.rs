@@ -9,7 +9,7 @@ pub fn find<T: PartialOrd+Copy>(slice: &[T], el: T) -> Option<usize> {
     }
     let higher = el > middle_el;
     if higher {
-        find(&slice[middle+1..], el)
+        find(&slice[middle+1..], el).map(|x| x+middle+1)
     } else {
         find(&slice[0..middle], el)
     }
@@ -27,6 +27,11 @@ mod tests {
     #[test]
     fn find_existing() {
         assert_eq!(Some(1), find(&[3, 4, 5, 9], 4));
+    }
+
+    #[test]
+    fn find_existing_tail() {
+        assert_eq!(Some(3), find(&[3, 4, 5, 9], 9));
     }
 
     #[test]
