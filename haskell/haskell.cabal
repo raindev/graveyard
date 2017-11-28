@@ -17,9 +17,10 @@ library
 
 test-suite tests
   type: exitcode-stdio-1.0
-  main-is: Algo/BinsearchSpec.hs
+  main-is: Algo/Spec.hs
   build-depends:       base >=4.9,
                        haskell,
                        hspec ==2.*,
                        vector ==0.12.*
   default-language:    Haskell2010
+  other-modules:       Algo.BinsearchSpec

@@ -1,12 +1,11 @@
-module Main (main) where
+module Algo.BinsearchSpec where
 
 import Algo.Binsearch
 import Data.Vector (empty, singleton, fromList)
-import Test.Hspec
+import Test.Hspec (Spec, describe, it, shouldBe)
 
-main :: IO ()
-main = hspec $ do
-
+spec :: Spec
+spec = do
   describe "Binary search" $ do
     it "finds nothing in empty list" $ do
       binarySearch empty 9 `shouldBe` Nothing
