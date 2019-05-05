@@ -5,12 +5,11 @@ use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Read;
 use std::io::Write;
-use std::ops::Range;
 use std::ops::RangeInclusive;
 use std::result::Result;
 
 struct Stations {
-    ids: Range<u32>,
+    ids: RangeInclusive<u32>,
     clients: u32,
     left: Option<Box<Stations>>,
     right: Option<Box<Stations>>,
@@ -32,7 +31,6 @@ fn base_stations(input: &mut Read, out: &mut Write) {
     let clients_str = lines.next().unwrap();
     let clients: Vec<u32> = clients_str
         .split(' ')
-        .inspect(|token| print!("t:{}, ", token))
         .map(str::parse)
         .map(Result::unwrap)
         .collect();
@@ -40,7 +38,7 @@ fn base_stations(input: &mut Read, out: &mut Write) {
     println!("number of stations: {}", clients.len());
     println!("connected clients:\n{:?}", clients);
     let mut stations = Stations {
-        ids: 1..clients.len() as u32 + 1,
+        ids: 1..=clients.len() as u32,
         clients: 0,
         left: None,
         right: None,
@@ -74,15 +72,16 @@ fn base_stations(input: &mut Read, out: &mut Write) {
 }
 
 fn initialize(stations: &mut Stations, clients: &[u32]) {
-    if stations.ids.start + 1 == stations.ids.end {
+    println!("initialize {:?}", stations.ids);
+    if stations.ids.start() == stations.ids.end() {
         // Stations are indexed starting from 1.
-        stations.clients = clients[(stations.ids.start - 1) as usize];
+        stations.clients = clients[(*stations.ids.start() - 1) as usize];
         // Range with one ID doesn't need to be split anymore.
         return;
     }
 
     let mut left = Box::new(Stations {
-        ids: stations.ids.start..(stations.ids.start + stations.ids.end) / 2,
+        ids: *stations.ids.start()..=(*stations.ids.start() + *stations.ids.end()) / 2,
         clients: 0,
         left: None,
         right: None,
@@ -92,7 +91,7 @@ fn initialize(stations: &mut Stations, clients: &[u32]) {
 
     stations.right = Some(Box::new(Stations {
         // Start from the end index of left since range is exclusive.
-        ids: (stations.ids.start + stations.ids.end) / 2..stations.ids.end,
+        ids: (*stations.ids.start() + *stations.ids.end()) / 2 + 1..=*stations.ids.end(),
         clients: 0,
         left: None,
         right: None,
@@ -110,12 +109,12 @@ fn update(stations: &mut Stations, id: u32, enter: bool) {
     } else {
         stations.clients -= 1;
     }
-    if stations.ids.start == id && stations.ids.start + 1 == stations.ids.end {
+    if *stations.ids.start() == id && stations.ids.start() == stations.ids.end() {
         println!("removed from {}, {} left", id, stations.clients);
         return;
     }
 
-    if id < stations.left.as_ref().unwrap().ids.end {
+    if id <= *stations.left.as_ref().unwrap().ids.end() {
         update(stations.left.as_mut().unwrap(), id, enter);
     } else {
         update(stations.right.as_mut().unwrap(), id, enter);
@@ -124,29 +123,28 @@ fn update(stations: &mut Stations, id: u32, enter: bool) {
 
 fn count(stations: &Stations, range: RangeInclusive<u32>) -> u32 {
     println!(
-        "{}..{} count {} {}",
-        stations.ids.start,
-        stations.ids.end,
+        "{:?} count {} {}",
+        stations.ids,
         range.start(),
         range.end()
     );
-    if stations.ids.start == *range.start() && stations.ids.end - 1 == *range.end() {
+    if stations.ids.start() == range.start() && stations.ids.end() == range.end() {
         stations.clients
     } else {
         let left_range = &stations.left.as_ref().unwrap().ids;
-        let left_count = if *range.start() < left_range.end {
+        let left_count = if range.start() <= left_range.end() {
             count(
                 &stations.left.as_ref().unwrap(),
-                *range.start()..=min(*range.end(), left_range.end - 1),
+                *range.start()..=min(*range.end(), *left_range.end()),
             )
         } else {
             0
         };
         let right_range = &stations.right.as_ref().unwrap().ids;
-        let right_count = if *range.end() >= left_range.end {
+        let right_count = if range.end() > left_range.end() {
             count(
                 &stations.right.as_ref().unwrap(),
-                max(*range.start(), right_range.start)..=*range.end(),
+                max(*range.start(), *right_range.start())..=*range.end(),
             )
         } else {
             0
