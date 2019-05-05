@@ -106,7 +106,7 @@ fn count(stations: &Stations, range: RangeInclusive<u32>) -> u32 {
         result += count(
             &stations.right.as_ref().unwrap(),
             max(*range.start(), *right_range.start())..=*range.end(),
-        )
+        );
     }
     result
 }
@@ -118,8 +118,7 @@ mod tests {
 
     #[test]
     fn odd_station_number() {
-        let mut input = std::io::BufReader::new(
-            "5
+        let mut input = "5
 2 0 2 3 1
 9
 COUNT 2 4
@@ -131,8 +130,7 @@ COUNT 4 5
 COUNT 1 2
 ENTER 2
 COUNT 1 2"
-                .as_bytes(),
-        );
+            .as_bytes();
         let mut output = Vec::new();
         base_stations(&mut input, &mut output);
         assert_eq!(
@@ -148,8 +146,7 @@ COUNT 1 2"
 
     #[test]
     fn even_station_number() {
-        let mut input = std::io::BufReader::new(
-            "4
+        let mut input = "4
 2 3 1 0
 5
 COUNT 1 4
@@ -157,8 +154,7 @@ ENTER 4
 COUNT 1 4
 LEAVE 1
 COUNT 1 3"
-                .as_bytes(),
-        );
+            .as_bytes();
         let mut output = Vec::new();
         base_stations(&mut input, &mut output);
         assert_eq!(
@@ -172,15 +168,13 @@ COUNT 1 3"
 
     #[test]
     fn one_station() {
-        let mut input = std::io::BufReader::new(
-            "1
+        let mut input = "1
 2
 3
 COUNT 1 1
 ENTER 1
 COUNT 1 1"
-                .as_bytes(),
-        );
+            .as_bytes();
         let mut output = Vec::new();
         base_stations(&mut input, &mut output);
         assert_eq!(
