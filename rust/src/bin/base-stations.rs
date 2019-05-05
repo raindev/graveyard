@@ -15,56 +15,46 @@ struct Stations {
     right: Option<Box<Stations>>,
 }
 
+impl Stations {
+    fn new(ids: RangeInclusive<u32>) -> Stations {
+        Stations {
+            ids,
+            clients: 0,
+            left: None,
+            right: None,
+        }
+    }
+}
+
 fn main() {
     let stdin = io::stdin();
     let stdout = io::stdout();
     base_stations(&mut stdin.lock(), &mut stdout.lock());
 }
 
-fn base_stations(input: &mut Read, out: &mut Write) {
-    println!("base_stations");
+fn base_stations(input: &mut Read, output: &mut Write) {
     let mut lines = BufReader::new(input).lines().map(Result::unwrap);
-    println!("lines");
-    let _stations: u32 = lines.next().unwrap().parse().unwrap();
-    println!("_stations");
-
-    let clients_str = lines.next().unwrap();
-    let clients: Vec<u32> = clients_str
+    lines.next(); // skip number of stations
+    let clients: Vec<u32> = lines
+        .next()
+        .unwrap()
         .split(' ')
         .map(str::parse)
         .map(Result::unwrap)
         .collect();
-    println!("clients");
-    println!("number of stations: {}", clients.len());
-    println!("connected clients:\n{:?}", clients);
-    let mut stations = Stations {
-        ids: 1..=clients.len() as u32,
-        clients: 0,
-        left: None,
-        right: None,
-    };
+    let mut stations = Stations::new(1..=clients.len() as u32);
     initialize(&mut stations, &clients);
-
-    let _events: u32 = lines.next().unwrap().parse().unwrap();
-
+    lines.next(); // skip number of commands
     for line in lines {
-        println!("{}", line);
-        let mut command = line.split(' ');
-        match command.next().unwrap() {
-            "LEAVE" => update(
-                &mut stations,
-                command.next().unwrap().parse().unwrap(),
-                false,
-            ),
-            "ENTER" => update(
-                &mut stations,
-                command.next().unwrap().parse().unwrap(),
-                true,
-            ),
+        let mut command_tokens = line.split(' ');
+        let command = command_tokens.next().unwrap();
+        let id = command_tokens.next().unwrap().parse().unwrap();
+        match command {
+            "LEAVE" => update(&mut stations, id, -1),
+            "ENTER" => update(&mut stations, id, 1),
             "COUNT" => {
-                let start = command.next().unwrap().parse().unwrap();
-                let mut end = command.next().unwrap().parse().unwrap();
-                writeln!(out, "{}", count(&stations, start..=end)).unwrap();
+                let end_id = command_tokens.next().unwrap().parse().unwrap();
+                writeln!(output, "{}", count(&stations, id..=end_id)).unwrap();
             }
             _ => panic!(),
         }
@@ -72,85 +62,53 @@ fn base_stations(input: &mut Read, out: &mut Write) {
 }
 
 fn initialize(stations: &mut Stations, clients: &[u32]) {
-    println!("initialize {:?}", stations.ids);
     if stations.ids.start() == stations.ids.end() {
         // Stations are indexed starting from 1.
         stations.clients = clients[(*stations.ids.start() - 1) as usize];
         // Range with one ID doesn't need to be split anymore.
         return;
     }
-
-    let mut left = Box::new(Stations {
-        ids: *stations.ids.start()..=(*stations.ids.start() + *stations.ids.end()) / 2,
-        clients: 0,
-        left: None,
-        right: None,
-    });
-    initialize(&mut left, clients);
-    stations.left = Some(left);
-
-    stations.right = Some(Box::new(Stations {
-        // Start from the end index of left since range is exclusive.
-        ids: (*stations.ids.start() + *stations.ids.end()) / 2 + 1..=*stations.ids.end(),
-        clients: 0,
-        left: None,
-        right: None,
-    }));
+    let middle = (*stations.ids.start() + *stations.ids.end()) / 2;
+    stations.left = Some(Box::new(Stations::new(*stations.ids.start()..=middle)));
+    initialize(stations.left.as_mut().unwrap(), clients);
+    stations.right = Some(Box::new(Stations::new(middle + 1..=*stations.ids.end())));
     initialize(stations.right.as_mut().unwrap(), clients);
-
     stations.clients =
         stations.left.as_ref().unwrap().clients + stations.right.as_ref().unwrap().clients;
-    println!("{:?}: {}", stations.ids, stations.clients);
 }
 
-fn update(stations: &mut Stations, id: u32, enter: bool) {
-    if enter {
-        stations.clients += 1;
-    } else {
-        stations.clients -= 1;
-    }
+fn update(stations: &mut Stations, id: u32, count: i32) {
+    stations.clients = (stations.clients as i32 + count) as u32;
     if *stations.ids.start() == id && stations.ids.start() == stations.ids.end() {
-        println!("removed from {}, {} left", id, stations.clients);
         return;
     }
-
     if id <= *stations.left.as_ref().unwrap().ids.end() {
-        update(stations.left.as_mut().unwrap(), id, enter);
+        update(stations.left.as_mut().unwrap(), id, count);
     } else {
-        update(stations.right.as_mut().unwrap(), id, enter);
+        update(stations.right.as_mut().unwrap(), id, count);
     }
 }
 
 fn count(stations: &Stations, range: RangeInclusive<u32>) -> u32 {
-    println!(
-        "{:?} count {} {}",
-        stations.ids,
-        range.start(),
-        range.end()
-    );
     if stations.ids.start() == range.start() && stations.ids.end() == range.end() {
-        stations.clients
-    } else {
-        let left_range = &stations.left.as_ref().unwrap().ids;
-        let left_count = if range.start() <= left_range.end() {
-            count(
-                &stations.left.as_ref().unwrap(),
-                *range.start()..=min(*range.end(), *left_range.end()),
-            )
-        } else {
-            0
-        };
-        let right_range = &stations.right.as_ref().unwrap().ids;
-        let right_count = if range.end() > left_range.end() {
-            count(
-                &stations.right.as_ref().unwrap(),
-                max(*range.start(), *right_range.start())..=*range.end(),
-            )
-        } else {
-            0
-        };
-        left_count + right_count
+        return stations.clients;
     }
+    let mut result = 0;
+    let left_range = &stations.left.as_ref().unwrap().ids;
+    if range.start() <= left_range.end() {
+        result += count(
+            &stations.left.as_ref().unwrap(),
+            *range.start()..=min(*range.end(), *left_range.end()),
+        );
+    }
+    let right_range = &stations.right.as_ref().unwrap().ids;
+    if range.end() >= right_range.start() {
+        result += count(
+            &stations.right.as_ref().unwrap(),
+            max(*range.start(), *right_range.start())..=*range.end(),
+        )
+    }
+    result
 }
 
 #[cfg(test)]
@@ -232,5 +190,4 @@ COUNT 1 1"
             String::from_utf8(output).unwrap()
         );
     }
-
 }
