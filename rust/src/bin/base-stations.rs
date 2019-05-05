@@ -32,7 +32,7 @@ fn base_stations(input: &mut Read, out: &mut Write) {
     let clients: Vec<u32> = clients_str
         .split(' ')
         .inspect(|token| print!("t:{}, ", token))
-        .map(|n| n.parse())
+        .map(str::parse)
         .map(Result::unwrap)
         .collect();
     println!("clients");
@@ -65,7 +65,7 @@ fn base_stations(input: &mut Read, out: &mut Write) {
     }
 }
 
-fn initialize(stations: &mut Stations, clients: &Vec<u32>) {
+fn initialize(stations: &mut Stations, clients: &[u32]) {
     if stations.ids.start + 1 == stations.ids.end {
         // Stations are indexed starting from 1.
         stations.clients = clients[(stations.ids.start - 1) as usize];
@@ -130,7 +130,7 @@ fn count(stations: &Stations, range: Range<u32>) -> u32 {
         stations.ids.start, stations.ids.end, range.start, range.end
     );
     if stations.ids == range {
-        return stations.clients;
+        stations.clients
     } else {
         let left_range = &stations.left.as_ref().unwrap().ids;
         let left_count = if range.start < left_range.end {
@@ -150,7 +150,7 @@ fn count(stations: &Stations, range: Range<u32>) -> u32 {
         } else {
             0
         };
-        return left_count + right_count;
+        left_count + right_count
     }
 }
 
