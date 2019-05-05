@@ -6,6 +6,7 @@ use std::io::BufReader;
 use std::io::Read;
 use std::io::Write;
 use std::ops::Range;
+use std::ops::RangeInclusive;
 use std::result::Result;
 
 struct Stations {
@@ -52,13 +53,20 @@ fn base_stations(input: &mut Read, out: &mut Write) {
         println!("{}", line);
         let mut command = line.split(' ');
         match command.next().unwrap() {
-            "LEAVE" => leave(&mut stations, command.next().unwrap().parse().unwrap()),
-            "ENTER" => enter(&mut stations, command.next().unwrap().parse().unwrap()),
+            "LEAVE" => update(
+                &mut stations,
+                command.next().unwrap().parse().unwrap(),
+                false,
+            ),
+            "ENTER" => update(
+                &mut stations,
+                command.next().unwrap().parse().unwrap(),
+                true,
+            ),
             "COUNT" => {
                 let start = command.next().unwrap().parse().unwrap();
                 let mut end = command.next().unwrap().parse().unwrap();
-                end += 1; // COUNT is inclusive, Range is not.
-                writeln!(out, "{}", count(&stations, start..end)).unwrap();
+                writeln!(out, "{}", count(&stations, start..=end)).unwrap();
             }
             _ => panic!(),
         }
@@ -96,56 +104,49 @@ fn initialize(stations: &mut Stations, clients: &[u32]) {
     println!("{:?}: {}", stations.ids, stations.clients);
 }
 
-fn leave(stations: &mut Stations, id: u32) {
-    stations.clients -= 1;
+fn update(stations: &mut Stations, id: u32, enter: bool) {
+    if enter {
+        stations.clients += 1;
+    } else {
+        stations.clients -= 1;
+    }
     if stations.ids.start == id && stations.ids.start + 1 == stations.ids.end {
         println!("removed from {}, {} left", id, stations.clients);
         return;
     }
 
     if id < stations.left.as_ref().unwrap().ids.end {
-        leave(stations.left.as_mut().unwrap(), id);
+        update(stations.left.as_mut().unwrap(), id, enter);
     } else {
-        leave(stations.right.as_mut().unwrap(), id);
+        update(stations.right.as_mut().unwrap(), id, enter);
     }
 }
 
-fn enter(stations: &mut Stations, id: u32) {
-    stations.clients += 1;
-    if stations.ids.start == id && stations.ids.start + 1 == stations.ids.end {
-        println!("added to {}, {} connected", id, stations.clients);
-        return;
-    }
-
-    if id < stations.left.as_ref().unwrap().ids.end {
-        enter(stations.left.as_mut().unwrap(), id);
-    } else {
-        enter(stations.right.as_mut().unwrap(), id);
-    }
-}
-
-fn count(stations: &Stations, range: Range<u32>) -> u32 {
+fn count(stations: &Stations, range: RangeInclusive<u32>) -> u32 {
     println!(
         "{}..{} count {} {}",
-        stations.ids.start, stations.ids.end, range.start, range.end
+        stations.ids.start,
+        stations.ids.end,
+        range.start(),
+        range.end()
     );
-    if stations.ids == range {
+    if stations.ids.start == *range.start() && stations.ids.end - 1 == *range.end() {
         stations.clients
     } else {
         let left_range = &stations.left.as_ref().unwrap().ids;
-        let left_count = if range.start < left_range.end {
+        let left_count = if *range.start() < left_range.end {
             count(
                 &stations.left.as_ref().unwrap(),
-                range.start..min(range.end, left_range.end),
+                *range.start()..=min(*range.end(), left_range.end - 1),
             )
         } else {
             0
         };
         let right_range = &stations.right.as_ref().unwrap().ids;
-        let right_count = if range.end > left_range.end {
+        let right_count = if *range.end() >= left_range.end {
             count(
                 &stations.right.as_ref().unwrap(),
-                max(range.start, right_range.start)..range.end,
+                max(*range.start(), right_range.start)..=*range.end(),
             )
         } else {
             0
