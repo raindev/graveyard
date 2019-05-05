@@ -1,8 +1,9 @@
 pub fn join(ss: &Vec<String>) -> String {
     if ss.is_empty() {
-        return String::new()
+        return String::new();
     }
-    let mut string = ss.iter()
+    let mut string = ss
+        .iter()
         .map(|s| s.replace('`', "``"))
         .collect::<Vec<String>>()
         .join("`$");
@@ -36,8 +37,8 @@ pub fn split(s: &str) -> Vec<String> {
 mod tests {
     extern crate quickcheck;
 
-    use super::*;
     use self::quickcheck::quickcheck;
+    use super::*;
 
     fn to_str_vec(v: Vec<&str>) -> Vec<String> {
         v.iter().map(|s| str::to_owned(*s)).collect()

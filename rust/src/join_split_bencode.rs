@@ -1,7 +1,5 @@
 pub fn join(ss: &Vec<String>) -> String {
-    ss.iter()
-        .map(|s| format!("{}:{}", s.len(), s))
-        .collect()
+    ss.iter().map(|s| format!("{}:{}", s.len(), s)).collect()
 }
 
 pub fn split(s: &str) -> Vec<String> {
@@ -25,8 +23,8 @@ pub fn split(s: &str) -> Vec<String> {
 mod tests {
     extern crate quickcheck;
 
-    use super::*;
     use self::quickcheck::quickcheck;
+    use super::*;
 
     fn to_str_vec(v: Vec<&str>) -> Vec<String> {
         v.iter().map(|s| str::to_owned(*s)).collect()

@@ -1,4 +1,4 @@
-pub fn find<T: PartialOrd+Copy>(slice: &[T], el: T) -> Option<usize> {
+pub fn find<T: PartialOrd + Copy>(slice: &[T], el: T) -> Option<usize> {
     if slice.is_empty() {
         return None;
     }
@@ -9,7 +9,7 @@ pub fn find<T: PartialOrd+Copy>(slice: &[T], el: T) -> Option<usize> {
     }
     let higher = el > middle_el;
     if higher {
-        find(&slice[middle+1..], el).map(|x| x+middle+1)
+        find(&slice[middle + 1..], el).map(|x| x + middle + 1)
     } else {
         find(&slice[0..middle], el)
     }
