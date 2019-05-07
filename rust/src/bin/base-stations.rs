@@ -33,8 +33,8 @@ fn main() {
 }
 
 fn base_stations(input: &mut Read, output: &mut Write) {
-    let mut lines = BufReader::new(input).lines().map(Result::unwrap);
-    lines.next(); // skip number of stations
+    // skip number of stations
+    let mut lines = BufReader::new(input).lines().map(Result::unwrap).skip(1);
     let clients: Vec<u32> = lines
         .next()
         .unwrap()
@@ -44,8 +44,8 @@ fn base_stations(input: &mut Read, output: &mut Write) {
         .collect();
     let mut stations = Stations::new(1..=clients.len() as u32);
     initialize(&mut stations, &clients);
-    lines.next(); // skip number of commands
-    for line in lines {
+    // skip number of commands
+    for line in lines.skip(1) {
         let mut command_tokens = line.split(' ');
         let command = command_tokens.next().unwrap();
         let id = command_tokens.next().unwrap().parse().unwrap();
