@@ -118,69 +118,66 @@ mod tests {
 
     #[test]
     fn odd_station_number() {
-        let mut input = "5
-2 0 2 3 1
-9
-COUNT 2 4
-ENTER 2
-LEAVE 1
-COUNT 2 4
-LEAVE 5
-COUNT 4 5
-COUNT 1 2
-ENTER 2
-COUNT 1 2"
+        let mut input = "5\n\
+                         2 0 2 3 1\n\
+                         9\n\
+                         COUNT 2 4\n\
+                         ENTER 2\n\
+                         LEAVE 1\n\
+                         COUNT 2 4\n\
+                         LEAVE 5\n\
+                         COUNT 4 5\n\
+                         COUNT 1 2\n\
+                         ENTER 2\n\
+                         COUNT 1 2"
             .as_bytes();
         let mut output = Vec::new();
         base_stations(&mut input, &mut output);
         assert_eq!(
-            "5
-6
-3
-2
-3
-",
+            "5\n\
+             6\n\
+             3\n\
+             2\n\
+             3\n",
             String::from_utf8(output).unwrap()
         );
     }
 
     #[test]
     fn even_station_number() {
-        let mut input = "4
-2 3 1 0
-5
-COUNT 1 4
-ENTER 4
-COUNT 1 4
-LEAVE 1
-COUNT 1 3"
+        let mut input = "4\n\
+                         2 3 1 0\n\
+                         5\n\
+                         COUNT 1 4\n\
+                         ENTER 4\n\
+                         COUNT 1 4\n\
+                         LEAVE 1\n\
+                         COUNT 1 3"
             .as_bytes();
         let mut output = Vec::new();
         base_stations(&mut input, &mut output);
         assert_eq!(
-            "6
-7
-5
-",
+            "6\n\
+             7\n\
+             5\n",
             String::from_utf8(output).unwrap()
         );
     }
 
     #[test]
     fn one_station() {
-        let mut input = "1
-2
-3
-COUNT 1 1
-ENTER 1
-COUNT 1 1"
+        let mut input = "1\n\
+                         2\n\
+                         3\n\
+                         COUNT 1 1\n\
+                         ENTER 1\n\
+                         COUNT 1 1"
             .as_bytes();
         let mut output = Vec::new();
         base_stations(&mut input, &mut output);
         assert_eq!(
-            "2
-3
-",
+            "2\n\
+             3\n",
             String::from_utf8(output).unwrap()
         );
     }
