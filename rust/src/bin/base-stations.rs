@@ -82,7 +82,7 @@ fn update(stations: &mut Stations, id: u32, count: i32) {
     if *stations.ids.start() == id && stations.ids.start() == stations.ids.end() {
         return;
     }
-    if id <= *stations.left.as_ref().unwrap().ids.end() {
+    if stations.left.as_ref().unwrap().ids.contains(&id) {
         update(stations.left.as_mut().unwrap(), id, count);
     } else {
         update(stations.right.as_mut().unwrap(), id, count);
@@ -95,14 +95,14 @@ fn count(stations: &Stations, range: RangeInclusive<u32>) -> u32 {
     }
     let mut result = 0;
     let left_range = &stations.left.as_ref().unwrap().ids;
-    if range.start() <= left_range.end() {
+    if left_range.contains(range.start()) {
         result += count(
             &stations.left.as_ref().unwrap(),
             *range.start()..=min(*range.end(), *left_range.end()),
         );
     }
     let right_range = &stations.right.as_ref().unwrap().ids;
-    if range.end() >= right_range.start() {
+    if right_range.contains(range.end()) {
         result += count(
             &stations.right.as_ref().unwrap(),
             max(*range.start(), *right_range.start())..=*range.end(),
