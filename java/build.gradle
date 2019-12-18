@@ -4,7 +4,7 @@ repositories {
   jcenter()
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
   gradleVersion = '4.5'
 }
 
