@@ -6,23 +6,46 @@ import java.util.stream.Collectors;
 
 public class DigitalClock {
     /**
-     * Finds maximum 24 hour digital time that given digits can represent.
+     * Finds latest 24 hour digital time that given digits can represent.
      *
-     * @param digits six digits
-     * @return maximum time {@code digits} can represent in format hh:mm::ss
+     * @param digits a string of six digits
+     * @return latest time {@code digits} can represent in format hh:mm::ss
      * @throws IllegalArgumentException if valid time cannot be constructed
      */
     public static String latestTime(String digits) {
-        if (digits.length() != 6 || !digits.chars().allMatch(Character::isDigit)) {
-            throw new IllegalArgumentException();
-        }
-        final List<Integer> digitsList = digits.chars()
-                .mapToObj(Character::getNumericValue)
-                .collect(Collectors.toList());
+        final List<Integer> digitsList = validDigits(digits);
         final var tensOfHours = removeLargest(digitsList, 2);
         return "" + tensOfHours + removeLargest(digitsList, tensOfHours == 2 ? 3 : 9)
                 + ":" + removeLargest(digitsList, 5) + removeLargest(digitsList, 9)
                 + ":" + removeLargest(digitsList, 5) + removeLargest(digitsList, 9);
+    }
+
+    /**
+     * Find earliest 24 hour digital time that given digits can represent.
+     *
+     * @param digits a string of six digits
+     * @return earliest time {@code digits} can represent in format hh:mm::ss
+     * @throws IllegalArgumentException if valid time cannot be constructed
+     */
+    public static String earliestTime(String digits) {
+        final List<Integer> digitsList = validDigits(digits);
+        final var seconds = removeLargest(digitsList, 9);
+        final var tensOfSeconds = removeLargest(digitsList, 5);
+        final var minutes = removeLargest(digitsList, 9);
+        final var tensOfMinutes = removeLargest(digitsList, 5);
+        final var hours = removeLargest(digitsList, 9);
+        final var tensOfHours = removeLargest(digitsList, hours > 3 ? 1 : 2);
+        return "" + tensOfHours + hours + ":" + tensOfMinutes + minutes
+                + ":" + tensOfSeconds + seconds;
+    }
+
+    public static List<Integer> validDigits(String digits) {
+        if (digits.length() != 6 || !digits.chars().allMatch(Character::isDigit)) {
+            throw new IllegalArgumentException();
+        }
+        return digits.chars()
+                .mapToObj(Character::getNumericValue)
+                .collect(Collectors.toList());
     }
 
     private static int removeLargest(List<Integer> numbers, int limit) {
