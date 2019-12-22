@@ -1,9 +1,9 @@
 package io.raindev.binarysearch;
 
 import java.util.Optional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import static io.raindev.binarysearch.BinarySearch.binarySearch;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BinarySearchTest {
     Integer[] array =  new Integer[]{null, 3, 4, 6, 7, 8, 11};

@@ -2,14 +2,14 @@ package io.raindev.hashtable;
 
 import java.util.stream.IntStream;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HashTableTest {
     HashTable<String, Integer> hashTable;
 
-    @Before public void setUp() {
+    @BeforeEach public void setUp() {
         hashTable = new HashTable<>();
     }
 
@@ -83,24 +83,28 @@ public class HashTableTest {
         assertEquals(0, hashTable.size());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void putProhibitNullKeys() {
-        hashTable.put(null, 1);
+        assertThrows(NullPointerException.class,
+            () -> hashTable.put(null, 1));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void putProhibitNullValues() {
-        hashTable.put("nothing", null);
+        assertThrows(NullPointerException.class,
+            () -> hashTable.put("nothing", null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void getProhibitNullKeys() {
-        hashTable.get(null);
+        assertThrows(NullPointerException.class,
+            () -> hashTable.get(null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void removeProhibitNullKeys() {
-        hashTable.remove(null);
+        assertThrows(NullPointerException.class,
+            () -> hashTable.remove(null));
     }
 
     @Test public void remove() {
