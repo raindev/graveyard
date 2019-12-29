@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 class HashTable<K, V> {
     private static class Entry<K, V> {
-        K key;
+        final K key;
         V value;
 
         Entry(K key, V value) {

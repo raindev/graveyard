@@ -1,4 +1,4 @@
-package io.raindev.uniqueuestr;
+package io.raindev.uniquestr;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
