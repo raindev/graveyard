@@ -32,7 +32,7 @@ fn main() {
     base_stations(&mut stdin.lock(), &mut stdout.lock());
 }
 
-fn base_stations(input: &mut Read, output: &mut Write) {
+fn base_stations<R: Read, W: Write>(input: &mut R, output: &mut W) {
     // skip number of stations
     let mut lines = BufReader::new(input).lines().map(Result::unwrap).skip(1);
     let clients: Vec<u32> = lines

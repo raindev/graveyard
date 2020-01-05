@@ -1,4 +1,4 @@
-pub fn join(ss: &Vec<String>) -> String {
+pub fn join(ss: &[String]) -> String {
     if ss.is_empty() {
         return String::new();
     }

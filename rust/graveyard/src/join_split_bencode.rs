@@ -1,4 +1,4 @@
-pub fn join(ss: &Vec<String>) -> String {
+pub fn join(ss: &[String]) -> String {
     ss.iter().map(|s| format!("{}:{}", s.len(), s)).collect()
 }
 
@@ -6,7 +6,7 @@ pub fn split(s: &str) -> Vec<String> {
     let mut length_index = 0;
     let mut result = Vec::new();
     loop {
-        let next_colon = s[length_index..].find(":");
+        let next_colon = s[length_index..].find(':');
         if let Some(rel_colon_index) = next_colon {
             let colon_index = rel_colon_index + length_index;
             let length: usize = s[length_index..colon_index].parse().unwrap();
