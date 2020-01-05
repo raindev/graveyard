@@ -1,3 +1,5 @@
+use log;
+use pretty_env_logger;
 use std::{io::BufRead, io::BufReader, io::Read, net::TcpListener, thread, thread::JoinHandle};
 
 type Error = Box<dyn std::error::Error>;
@@ -32,20 +34,28 @@ fn source_events<R: 'static + Read + Send>(events: R) -> JoinHandle<()> {
         let mut event_count = 0;
         for event_line in BufReader::new(events).lines() {
             let event_line = event_line.expect("failed to read event from source");
-            println!("Received event from source: {}", event_line);
+            log::trace!("Received event from source: {}", event_line);
             event_count += 1;
             if event_count == EXPECTED_EVENT_COUNT {
-                println!("Processed all ({}) events", EXPECTED_EVENT_COUNT);
+                log::info!("Processed all ({}) events", EXPECTED_EVENT_COUNT);
                 break;
             }
+        }
+        if event_count != EXPECTED_EVENT_COUNT {
+            log::warn!(
+                "Expected {} events, only {} received",
+                EXPECTED_EVENT_COUNT,
+                event_count
+            );
         }
     })
 }
 
 fn main() -> Result<()> {
+    pretty_env_logger::init();
     let source_listener = TcpListener::bind("127.0.0.1:9999")?;
     let (mut source_stream, _addr) = source_listener.accept()?;
-    println!(
+    log::info!(
         "Total number of users: {}",
         total_users(&mut source_stream)?
     );

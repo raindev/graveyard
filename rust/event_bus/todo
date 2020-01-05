@@ -1,6 +1,6 @@
 - [x] implement event acceptor
 - [x] run event acceptor in a separate thread
-- [ ] implement logging
+- [x] implement logging
 - [ ] parse source events
 - [?] close connections when done
 - [ ] implement client acceptor
