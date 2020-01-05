@@ -1,4 +1,4 @@
-use std::{convert::TryFrom, str::FromStr};
+use std::str::FromStr;
 
 type Error = Box<dyn std::error::Error>;
 type Result<T> = std::result::Result<T, Error>;
@@ -9,7 +9,7 @@ type Message = String;
 
 /// Represent an event related to user action.
 #[derive(Debug, PartialEq)]
-struct Event {
+pub struct Event {
     /// Event sequence number.
     /// Represents its position in the global order of events.
     seq: SeqNo,
@@ -29,10 +29,10 @@ enum Action {
     Block(UserId),
 }
 
-impl TryFrom<&str> for Event {
-    type Error = Error;
+impl FromStr for Event {
+    type Err = Error;
 
-    fn try_from(value: &str) -> Result<Self> {
+    fn from_str(value: &str) -> Result<Self> {
         let mut event_fields = value.split('/');
         let seq = parse_next(&mut event_fields, "event sequence number")?;
         let action_tag = parse_next(&mut event_fields, "action tag")?;
@@ -93,7 +93,7 @@ mod tests {
                 user_id: 5,
                 action: Action::Follow(10),
             }),
-            Event::try_from("1/F/5/10").ok()
+            "1/F/5/10".parse().ok()
         );
     }
 
@@ -105,7 +105,7 @@ mod tests {
                 user_id: 8,
                 action: Action::Unfollow(16),
             }),
-            Event::try_from("78/U/8/16").ok()
+            "78/U/8/16".parse().ok()
         );
     }
 
@@ -117,7 +117,7 @@ mod tests {
                 user_id: 2,
                 action: Action::StatusUpdate("Hello World".to_string()),
             }),
-            Event::try_from("8/S/2/Hello World").ok()
+            "8/S/2/Hello World".parse().ok()
         );
     }
 
@@ -129,7 +129,7 @@ mod tests {
                 user_id: 3,
                 action: Action::PrivateMessage(6, "Foo Bar".to_string()),
             }),
-            Event::try_from("100/P/3/6/Foo Bar").ok()
+            "100/P/3/6/Foo Bar".parse().ok()
         );
     }
 
@@ -141,27 +141,27 @@ mod tests {
                 user_id: 200,
                 action: Action::Block(43),
             }),
-            Event::try_from("6/B/200/43").ok()
+            "6/B/200/43".parse().ok()
         );
     }
 
     #[test]
     fn parse_empty_event() {
-        assert!(Event::try_from("").is_err());
+        assert!(Event::from_str("").is_err());
     }
 
     #[test]
     fn parse_event_non_numeric_seq() {
-        assert!(Event::try_from("A/U/200/43").is_err());
+        assert!(Event::from_str("A/U/200/43").is_err());
     }
 
     #[test]
     fn parse_follow_event_no_target_user() {
-        assert!(Event::try_from("100/F/3").is_err());
+        assert!(Event::from_str("100/F/3").is_err());
     }
 
     #[test]
     fn parse_private_message_event_empty_text() {
-        assert!(Event::try_from("100/P/3/6/").is_err());
+        assert!(Event::from_str("100/P/3/6/").is_err());
     }
 }

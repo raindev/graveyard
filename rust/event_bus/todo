@@ -1,7 +1,7 @@
 - [x] implement event acceptor
 - [x] run event acceptor in a separate thread
 - [x] implement logging
-- [ ] parse source events
+- [x] parse source events
 - [ ] explore using serde for parsing
 - [?] close connections when done
 - [ ] implement client acceptor

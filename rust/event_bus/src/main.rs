@@ -1,8 +1,12 @@
 mod event;
 
+use event::Event;
 use log;
 use pretty_env_logger;
-use std::{io::BufRead, io::BufReader, io::Read, net::TcpListener, thread, thread::JoinHandle};
+use std::{
+    io::BufRead, io::BufReader, io::Read, net::TcpListener, str::FromStr, thread,
+    thread::JoinHandle,
+};
 
 type Error = Box<dyn std::error::Error>;
 type Result<T> = std::result::Result<T, Error>;
@@ -36,7 +40,10 @@ fn source_events<R: 'static + Read + Send>(events: R) -> JoinHandle<()> {
         let mut event_count = 0;
         for event_line in BufReader::new(events).lines() {
             let event_line = event_line.expect("failed to read event from source");
-            log::trace!("Received event from source: {}", event_line);
+            log::trace!(
+                "Received event from source: {:?}",
+                Event::from_str(&event_line).expect("failed to parse event")
+            );
             event_count += 1;
             if event_count == EXPECTED_EVENT_COUNT {
                 log::info!("Processed all ({}) events", EXPECTED_EVENT_COUNT);
