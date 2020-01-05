@@ -1,42 +1,56 @@
-use std::{io::BufRead, io::Read, io::BufReader, net::TcpListener};
+use std::{io::BufRead, io::BufReader, io::Read, net::TcpListener, thread, thread::JoinHandle};
 
 type Error = Box<dyn std::error::Error>;
 type Result<T> = std::result::Result<T, Error>;
 type UserCount = usize;
 
+/// Maximum number of events consumed from event source.
 const EXPECTED_EVENT_COUNT: usize = 1_000_000;
 
 #[test]
 fn source_events_test() {
-    assert_eq!(Some(5), source_events("5\n".as_bytes()).ok());
+    assert_eq!(Some(5), total_users(&mut "5\n".as_bytes()).ok());
 }
 
 #[test]
 fn source_events_empty() {
-    assert!(source_events("".as_bytes()).is_err());
+    assert!(total_users(&mut "".as_bytes()).is_err());
 }
 
-fn source_events<R: Read>(events: R) -> Result<UserCount> {
-    let mut event_reader = BufReader::new(events);
+/// Reads total number of users from event source.
+fn total_users<R: Read>(source: &mut R) -> Result<UserCount> {
+    let mut source_reader = BufReader::new(source);
     let mut buff = String::new();
-    event_reader.read_line(&mut buff)?;
+    source_reader.read_line(&mut buff)?;
     let user_count = buff.trim_end().parse::<UserCount>()?;
-    let mut event_count = 0;
-    for event_line in event_reader.lines() {
-        println!("Received event from source: {}", event_line?);
-        event_count += 1;
-        if event_count == EXPECTED_EVENT_COUNT {
-            println!("Processed all ({}) events", EXPECTED_EVENT_COUNT);
-            break;
+    Ok(user_count)
+}
+
+/// Processes stream of source events.
+fn source_events<R: 'static + Read + Send>(events: R) -> JoinHandle<()> {
+    thread::spawn(|| {
+        let mut event_count = 0;
+        for event_line in BufReader::new(events).lines() {
+            let event_line = event_line.expect("failed to read event from source");
+            println!("Received event from source: {}", event_line);
+            event_count += 1;
+            if event_count == EXPECTED_EVENT_COUNT {
+                println!("Processed all ({}) events", EXPECTED_EVENT_COUNT);
+                break;
+            }
         }
-    }
-    Result::Ok(user_count)
+    })
 }
 
 fn main() -> Result<()> {
     let source_listener = TcpListener::bind("127.0.0.1:9999")?;
-    let (source_stream, _addr) = source_listener.accept()?;
-    let user_count = source_events(BufReader::new(source_stream))?;
-    println!("Total number of users: {}", user_count);
-    Result::Ok(())
+    let (mut source_stream, _addr) = source_listener.accept()?;
+    println!(
+        "Total number of users: {}",
+        total_users(&mut source_stream)?
+    );
+    source_events(source_stream)
+        .join()
+        .expect("processing events from the source failed");
+    Ok(())
 }

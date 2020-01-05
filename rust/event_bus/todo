@@ -1,4 +1,5 @@
 - [x] implement event acceptor
+- [x] run event acceptor in a separate thread
 - [ ] implement logging
 - [ ] parse source events
 - [?] close connections when done
