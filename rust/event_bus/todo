@@ -1,0 +1,10 @@
+- [x] implement event acceptor
+- [ ] implement logging
+- [ ] parse source events
+- [?] close connections when done
+- [ ] implement client acceptor
+- [ ] implement concurrent processing (processing log partitioning)
+- [ ] limit number of concurrently connected users
+- [ ] convert the code to async-std
+- [ ] read configuration from environment variables
+- [ ] figure out why `std::result::Result<usize, std::boxed::Box<dyn std::error::Error>>` does not implement `PartialEq`
