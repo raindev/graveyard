@@ -1,3 +1,5 @@
+mod event;
+
 use log;
 use pretty_env_logger;
 use std::{io::BufRead, io::BufReader, io::Read, net::TcpListener, thread, thread::JoinHandle};

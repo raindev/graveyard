@@ -2,10 +2,13 @@
 - [x] run event acceptor in a separate thread
 - [x] implement logging
 - [ ] parse source events
+- [ ] explore using serde for parsing
 - [?] close connections when done
 - [ ] implement client acceptor
 - [ ] implement concurrent processing (processing log partitioning)
 - [ ] limit number of concurrently connected users
 - [ ] convert the code to async-std
 - [ ] read configuration from environment variables
+- [ ] compare whole results
+- [ ] avoid copying data (make Event a view into raw string)
 - [ ] figure out why `std::result::Result<usize, std::boxed::Box<dyn std::error::Error>>` does not implement `PartialEq`
