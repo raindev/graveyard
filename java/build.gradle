@@ -1,4 +1,7 @@
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'com.adarshr.test-logger' version '2.0.0'
+}
 
 repositories {
   jcenter()
