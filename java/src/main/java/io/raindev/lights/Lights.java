@@ -13,11 +13,16 @@ public class Lights {
     public static int lightMoments(int[] switches) {
         BitSet lights = new BitSet();
         int moments = 0;
+        int nextOffLight = 0; // next switch in the sequence that needs to be turned on
         for (int i = 0; i < switches.length; i++) {
             // lights numbered starting from 1
-            lights.set(switches[i] - 1);
-            if (lights.nextClearBit(0) > i) {
-                moments += 1;
+            final int switchIndex = switches[i] - 1;
+            lights.set(switchIndex);
+            if (switchIndex == nextOffLight) {
+                nextOffLight = lights.nextClearBit(nextOffLight);
+                if (nextOffLight > i) {
+                    moments += 1;
+                }
             }
         }
         return moments;
