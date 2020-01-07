@@ -16,13 +16,26 @@ type UserCount = usize;
 const EXPECTED_EVENT_COUNT: usize = 1_000_000;
 
 #[test]
-fn source_events_test() {
+fn total_users_count_only() {
     assert_eq!(Some(5), total_users(&mut "5\n".as_bytes()).ok());
 }
 
 #[test]
-fn source_events_empty() {
+fn total_users_full_stream() {
+    assert_eq!(
+        Some(12),
+        total_users(&mut "12\n1/F/5/10\n8/S/2/status-update\n".as_bytes()).ok()
+    );
+}
+
+#[test]
+fn total_users_empty() {
     assert!(total_users(&mut "".as_bytes()).is_err());
+}
+
+#[test]
+fn total_users_invalid() {
+    assert!(total_users(&mut "a\n".as_bytes()).is_err());
 }
 
 /// Reads total number of users from event source.
