@@ -4,7 +4,9 @@
 - [x] parse source events
 - [ ] explore using serde for parsing
 - [?] close connections when done
-- [ ] implement client acceptor
+- [x] implement client acceptor
+- [ ] do not block client acceptor if a user is slow to identify itself
+- [ ] configure read/connection timeouts
 - [ ] implement concurrent processing (processing log partitioning)
 - [ ] limit number of concurrently connected users
 - [ ] convert the code to async-std
@@ -14,6 +16,11 @@
 - [ ] figure out why `std::result::Result<usize, std::boxed::Box<dyn std::error::Error>>` does not implement `PartialEq`
 - [ ] use Result for code run in separate threads
 - [?] start TCP listeners outside of main thread
-- [ ] investigate failure to parse an empty event
+- [ ] investigate failure to parse an empty message (event/user ID)[1]
+- [ ] use read/write lock for user connections
 - [ ] make the server resistent to client failures
 - [ ] check if visiblity can be tightened (instead of pub everywhere)
+- [?] write a test retry helper
+
+
+1. failed to parse ID of connecting user: ParseIntError { kind: Empty }', src/libcore/result.rs
