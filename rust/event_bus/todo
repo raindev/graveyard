@@ -12,3 +12,8 @@
 - [ ] compare whole results
 - [ ] avoid copying data (make Event a view into raw string)
 - [ ] figure out why `std::result::Result<usize, std::boxed::Box<dyn std::error::Error>>` does not implement `PartialEq`
+- [ ] use Result for code run in separate threads
+- [?] start TCP listeners outside of main thread
+- [ ] investigate failure to parse an empty event
+- [ ] make the server resistent to client failures
+- [ ] check if visiblity can be tightened (instead of pub everywhere)

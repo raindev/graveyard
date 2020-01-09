@@ -1,51 +1,22 @@
 mod event;
 
-use event::Event;
+use crate::event::Event;
+use event_bus::{parse_message, Result, UserCount, UserId};
 use log;
 use pretty_env_logger;
 use std::{
-    io::BufRead, io::BufReader, io::Read, net::TcpListener, str::FromStr, thread,
+    collections::HashMap,
+    io::BufRead,
+    io::BufReader,
+    io::Read,
+    net::{TcpListener, TcpStream},
+    str::FromStr,
+    thread,
     thread::JoinHandle,
 };
 
-type Error = Box<dyn std::error::Error>;
-type Result<T> = std::result::Result<T, Error>;
-type UserCount = usize;
-
 /// Maximum number of events consumed from event source.
 const EXPECTED_EVENT_COUNT: usize = 1_000_000;
-
-#[test]
-fn total_users_count_only() {
-    assert_eq!(Some(5), total_users(&mut "5\n".as_bytes()).ok());
-}
-
-#[test]
-fn total_users_full_stream() {
-    assert_eq!(
-        Some(12),
-        total_users(&mut "12\n1/F/5/10\n8/S/2/status-update\n".as_bytes()).ok()
-    );
-}
-
-#[test]
-fn total_users_empty() {
-    assert!(total_users(&mut "".as_bytes()).is_err());
-}
-
-#[test]
-fn total_users_invalid() {
-    assert!(total_users(&mut "a\n".as_bytes()).is_err());
-}
-
-/// Reads total number of users from event source.
-fn total_users<R: Read>(source: &mut R) -> Result<UserCount> {
-    let mut source_reader = BufReader::new(source);
-    let mut buff = String::new();
-    source_reader.read_line(&mut buff)?;
-    let user_count = buff.trim_end().parse::<UserCount>()?;
-    Ok(user_count)
-}
 
 /// Processes stream of source events.
 fn source_events<R: 'static + Read + Send>(events: R) -> JoinHandle<()> {
@@ -73,16 +44,38 @@ fn source_events<R: 'static + Read + Send>(events: R) -> JoinHandle<()> {
     })
 }
 
+fn start_user_acceptor(
+    tcp_listener: TcpListener,
+    mut user_streams: HashMap<UserId, BufReader<TcpStream>>,
+) -> JoinHandle<()> {
+    thread::spawn(move || {
+        for stream in tcp_listener.incoming() {
+            let stream = stream.expect("user connection failed");
+            let mut reader = BufReader::new(stream);
+            let user_id =
+                parse_message(&mut reader).expect("failed to parse ID of connecting user");
+            log::debug!("User {} connected", user_id);
+            user_streams.insert(user_id, reader);
+        }
+    })
+}
+
 fn main() -> Result<()> {
     pretty_env_logger::init();
     let source_listener = TcpListener::bind("127.0.0.1:9999")?;
-    let (mut source_stream, _addr) = source_listener.accept()?;
-    log::info!(
-        "Total number of users: {}",
-        total_users(&mut source_stream)?
-    );
-    source_events(source_stream)
+    log::debug!("Started source listener");
+    let user_listener = TcpListener::bind("127.0.0.1:9990")?;
+    log::debug!("Started user listener");
+    let (source_stream, _addr) = source_listener.accept()?;
+    let mut source_reader = BufReader::new(source_stream);
+    let total_users: UserCount = parse_message(&mut source_reader)?;
+    log::info!("Total number of users: {}", total_users);
+    source_events(source_reader)
         .join()
         .expect("processing events from the source failed");
+    let user_streams = HashMap::<UserId, BufReader<TcpStream>>::new();
+    start_user_acceptor(user_listener, user_streams)
+        .join()
+        .expect("user connection acceptor failed");
     Ok(())
 }
