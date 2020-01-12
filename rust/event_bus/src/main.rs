@@ -6,7 +6,7 @@ use log;
 use pretty_env_logger;
 use std::{
     collections::HashMap,
-    io::{BufRead, BufReader, Read, Write},
+    io::{BufRead, BufReader, Read},
     net::{TcpListener, TcpStream},
     str::FromStr,
     sync::{Arc, Mutex},

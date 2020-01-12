@@ -65,7 +65,7 @@ where
 {
     Ok(iter
         .next()
-        .ok_or(format!("{} expected", err_description))?
+        .ok_or_else(|| format!("{} expected", err_description))?
         .parse()?)
 }
 

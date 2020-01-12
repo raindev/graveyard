@@ -12,14 +12,14 @@
 - [ ] convert the code to async-std
 - [ ] read configuration from environment variables
 - [ ] compare whole results
-- [ ] avoid copying data (make Event a view into raw string)
-- [ ] figure out why `std::result::Result<usize, std::boxed::Box<dyn std::error::Error>>` does not implement `PartialEq`
+- [ ] avoid copying data (make Event a view into a string)
+- [x] figure out why `std::result::Result<usize, std::boxed::Box<dyn std::error::Error>>` does not implement `PartialEq`
 - [ ] use Result for code run in separate threads
 - [?] start TCP listeners outside of main thread
 - [ ] investigate failure to parse an empty message (event/user ID)[1]
 - [ ] use read/write lock for user connections
 - [ ] make the server resistent to client failures
-- [ ] check if visiblity can be tightened (instead of pub everywhere)
+- [x] check if visiblity can be tightened (instead of pub everywhere)
 - [?] write a test retry helper
 
 
