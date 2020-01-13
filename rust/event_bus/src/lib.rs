@@ -1,9 +1,12 @@
+pub mod event;
+pub mod user;
+pub mod source;
+
 use std::{io::BufRead, str::FromStr};
 
 pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
-pub type UserCount = usize;
-pub type UserId = u32;
+type UserId = u32;
 
 /// Reads total number of users from event source.
 pub fn parse_message<R, T>(source: &mut R) -> Result<T>

@@ -1,11 +1,10 @@
 use std::str::FromStr;
+use crate::UserId;
 
 type Error = Box<dyn std::error::Error>;
 type Result<T> = std::result::Result<T, Error>;
 
 type SeqNo = u64;
-type UserId = u32;
-type Message = String;
 
 /// Represent an event related to user action.
 #[derive(Debug, PartialEq)]
@@ -18,6 +17,8 @@ pub struct Event {
     /// Action performed by the user.
     action: Action,
 }
+
+type Message = String;
 
 /// Represents an action taken by a user.
 #[derive(Debug, PartialEq)]
