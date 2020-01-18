@@ -1,21 +1,23 @@
 use crate::{event::Event, UserId};
 use std::{
     collections::HashMap,
+    hash::BuildHasher,
     io::Write,
     sync::{mpsc::Receiver, Arc, Mutex},
     thread::JoinHandle,
 };
 
-pub fn process_events<S>(
+pub fn process_events<S, H>(
     events: Receiver<Event>,
-    user_streams: Arc<Mutex<HashMap<UserId, S>>>,
+    user_streams: Arc<Mutex<HashMap<UserId, S, H>>>,
 ) -> JoinHandle<()>
 where
     S: Write + Send + 'static,
+    H: BuildHasher + Send + 'static,
 {
     use std::thread;
 
-    let handle = thread::spawn(move || {
+    thread::spawn(move || {
         log::debug!("Event processor started");
         for event in events {
             log::trace!("Processing {:?}", event);
@@ -32,8 +34,7 @@ where
                 log::trace!("User not connected, discarding {:?}", event);
             }
         }
-    });
-    handle
+    })
 }
 
 #[cfg(test)]
@@ -44,11 +45,14 @@ mod tests {
     #[test]
     fn forward_event() -> Result<()> {
         use crate::event::{Action, Event};
-        use std::{sync::mpsc, io::BufWriter};
+        use std::{io::BufWriter, sync::mpsc};
 
         let (sender, receiver) = mpsc::channel();
         let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
-        user_streams.lock().unwrap().insert(42, BufWriter::new(Vec::new()));
+        user_streams
+            .lock()
+            .unwrap()
+            .insert(42, BufWriter::new(Vec::new()));
         let _handle = process_events(receiver, user_streams.clone());
         sender.send(Event {
             seq: 5,

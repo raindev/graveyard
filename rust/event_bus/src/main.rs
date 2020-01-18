@@ -26,7 +26,7 @@ fn main() -> Result<()> {
     let (sourced_events, source_handle) = source_events(source_reader);
     let user_streams = Arc::new(Mutex::new(UserStreams::new()));
     let user_handle = start_user_acceptor(user_listener, user_streams.clone());
-    let processor_handle = process_events(sourced_events, user_streams.clone());
+    let processor_handle = process_events(sourced_events, user_streams);
     source_handle
         .join()
         .expect("processing events from the source failed");
