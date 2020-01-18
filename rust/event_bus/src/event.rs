@@ -1,5 +1,9 @@
-use std::str::FromStr;
 use crate::UserId;
+use std::{
+    fmt,
+    fmt::{Display, Formatter},
+    str::FromStr,
+};
 
 type Error = Box<dyn std::error::Error>;
 type Result<T> = std::result::Result<T, Error>;
@@ -11,18 +15,18 @@ type SeqNo = u64;
 pub struct Event {
     /// Event sequence number.
     /// Represents its position in the global order of events.
-    seq: SeqNo,
+    pub seq: SeqNo,
     /// ID of the user that triggered the event.
-    user_id: UserId,
+    pub user_id: UserId,
     /// Action performed by the user.
-    action: Action,
+    pub action: Action,
 }
 
 type Message = String;
 
 /// Represents an action taken by a user.
 #[derive(Debug, PartialEq)]
-enum Action {
+pub enum Action {
     Follow(UserId),
     Unfollow(UserId),
     StatusUpdate(Message),
@@ -80,6 +84,30 @@ where
         return Err(Error::from("message text is empty"));
     }
     Ok(text.to_string())
+}
+
+impl Display for Event {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        use Action::*;
+
+        let (action_tag, target, message): (char, Option<UserId>, Option<&str>) = match &self.action
+        {
+            Follow(target) => ('F', Some(*target), None),
+            Unfollow(target) => ('U', Some(*target), None),
+            StatusUpdate(message) => ('S', None, Some(message)),
+            PrivateMessage(target, message) => ('P', Some(*target), Some(message)),
+            Block(target) => ('B', Some(*target), None),
+        };
+        write!(
+            f,
+            "{}/{}/{}{}{}",
+            self.seq,
+            action_tag,
+            self.user_id,
+            target.map_or_else(|| "".to_string(), |t| format!("/{}", t)),
+            message.map_or_else(|| "".to_string(), |m| format!("/{}", m))
+        )
+    }
 }
 
 #[cfg(test)]
@@ -164,5 +192,44 @@ mod tests {
     #[test]
     fn parse_private_message_event_empty_text() {
         assert!(Event::from_str("100/P/3/6/").is_err());
+    }
+
+    #[test]
+    fn format_follow_event() {
+        assert_eq!(
+            "5/F/7/8",
+            Event {
+                seq: 5,
+                user_id: 7,
+                action: Action::Follow(8),
+            }
+            .to_string()
+        );
+    }
+
+    #[test]
+    fn format_status_update() {
+        assert_eq!(
+            "3/S/9/hello there",
+            Event {
+                seq: 3,
+                user_id: 9,
+                action: Action::StatusUpdate("hello there".to_string()),
+            }
+            .to_string()
+        );
+    }
+
+    #[test]
+    fn format_private_message() {
+        assert_eq!(
+            "2/P/4/6/hello there",
+            Event {
+                seq: 2,
+                user_id: 4,
+                action: Action::PrivateMessage(6, "hello there".to_string()),
+            }
+            .to_string()
+        );
     }
 }

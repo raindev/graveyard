@@ -1,6 +1,7 @@
 pub mod event;
 pub mod user;
 pub mod source;
+pub mod processor;
 
 use std::{io::BufRead, str::FromStr};
 

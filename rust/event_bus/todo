@@ -21,6 +21,10 @@
 - [ ] make the server resistent to client failures
 - [x] check if visiblity can be tightened (instead of pub everywhere)
 - [?] write a test retry helper
+- [ ] write a full integration test
+- [ ] figure out if it's possible to pass Arc<Mutext<T>> instead of T
+- [ ] ensure graceful termination
+- [ ] name threads
 
 
 1. failed to parse ID of connecting user: ParseIntError { kind: Empty }', src/libcore/result.rs
