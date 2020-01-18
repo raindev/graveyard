@@ -25,7 +25,9 @@ where
                 .get_mut(&event.user_id)
             {
                 log::trace!("Forwarding to user {:?}", event);
-                write!(stream, "{}", event).expect("failed to write event to user stream");
+                writeln!(stream, "{}", event).expect("failed to write event to user stream");
+                // Transmit the event right away without waiting for the buffer to fill.
+                stream.flush().expect("failed to flush user stream");
             } else {
                 log::trace!("User not connected, discarding {:?}", event);
             }
@@ -42,11 +44,11 @@ mod tests {
     #[test]
     fn forward_event() -> Result<()> {
         use crate::event::{Action, Event};
-        use std::sync::mpsc;
+        use std::{sync::mpsc, io::BufWriter};
 
         let (sender, receiver) = mpsc::channel();
-        let user_streams = Arc::new(Mutex::new(HashMap::<UserId, Vec<u8>>::new()));
-        user_streams.lock().unwrap().insert(42, Vec::new());
+        let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
+        user_streams.lock().unwrap().insert(42, BufWriter::new(Vec::new()));
         let _handle = process_events(receiver, user_streams.clone());
         sender.send(Event {
             seq: 5,
@@ -56,8 +58,8 @@ mod tests {
         // TODO: Replace with a timed retry.
         std::thread::sleep(std::time::Duration::from_secs(1));
         let user_stream = user_streams.lock().unwrap();
-        let message = String::from_utf8(user_stream.get(&42).unwrap().clone())?;
-        assert_eq!("5/S/42/hello", message);
+        let message = String::from_utf8(user_stream.get(&42).unwrap().get_ref().clone())?;
+        assert_eq!("5/S/42/hello\n", message);
         Ok(())
     }
 }
