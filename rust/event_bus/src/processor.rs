@@ -53,17 +53,44 @@ mod tests {
             .lock()
             .unwrap()
             .insert(42, BufWriter::new(Vec::new()));
-        let _handle = process_events(receiver, user_streams.clone());
+        let handle = process_events(receiver, user_streams.clone());
         sender.send(Event {
             seq: 5,
             user_id: 42,
             action: Action::StatusUpdate("hello".to_string()),
         })?;
+        // close the channel after sending the event
+        drop(sender);
+
         // TODO: Replace with a timed retry.
         std::thread::sleep(std::time::Duration::from_secs(1));
         let user_stream = user_streams.lock().unwrap();
         let message = String::from_utf8(user_stream.get(&42).unwrap().get_ref().clone())?;
         assert_eq!("5/S/42/hello\n", message);
+
+        // wait for the processor to finish and propagate panic from the processor thread
+        handle.join().unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn drop_event_if_user_offline() -> Result<()> {
+        use crate::event::{Action, Event};
+        use std::{io::BufWriter, sync::mpsc};
+
+        let (sender, receiver) = mpsc::channel();
+        let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
+        let handle = process_events(receiver, user_streams.clone());
+        sender.send(Event {
+            seq: 5,
+            user_id: 42,
+            action: Action::StatusUpdate("hello".to_string()),
+        })?;
+        // close the channel after sending the event
+        drop(sender);
+
+        // wait for the processor to finish and propagate panic from the processor thread
+        handle.join().unwrap();
         Ok(())
     }
 }
