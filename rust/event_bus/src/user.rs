@@ -9,6 +9,7 @@ use std::{
 
 pub type UserStreams = HashMap<UserId, BufStream<TcpStream>>;
 
+/// Accepts incoming user connections.
 pub fn start_user_acceptor(user_streams: Arc<Mutex<UserStreams>>) -> JoinHandle<()> {
     use crate::parse_message;
     use std::thread;
@@ -24,6 +25,7 @@ pub fn start_user_acceptor(user_streams: Arc<Mutex<UserStreams>>) -> JoinHandle<
     thread::spawn(move || {
         log::debug!("User acceptor started");
         for stream in tcp_listener.incoming() {
+            // TODO prevent slow clients from blocking the acceptor
             let stream = stream.expect("user connection failed");
             let mut buf_reader = BufStream::new(stream);
             let user_id =

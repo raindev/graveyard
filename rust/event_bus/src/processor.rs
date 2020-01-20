@@ -8,6 +8,7 @@ use std::{
     thread::JoinHandle,
 };
 
+/// Processes ordered stream of events forwarding them to users as necessary.
 pub fn process_events<S, H>(
     events: Receiver<Event>,
     user_streams: Arc<Mutex<HashMap<UserId, S, H>>>,

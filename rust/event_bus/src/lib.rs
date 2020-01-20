@@ -9,7 +9,7 @@ pub type Error = Box<dyn std::error::Error>;
 pub type Result<T> = std::result::Result<T, Error>;
 type UserId = u32;
 
-/// Reads total number of users from event source.
+/// Reads total number of users from the source.
 pub fn parse_message<R, T>(source: &mut R) -> Result<T>
 where
     R: BufRead,

@@ -7,7 +7,9 @@ use std::{
 /// Maximum number of events consumed from event source.
 const EXPECTED_EVENT_COUNT: usize = 1_000_000;
 
-/// Processes stream of source events.
+/// Processes stream of source events. Orders events by seq. Expects all events with consequtive seqs starting from 1 to be received.
+/// Processing would block if there's a gap in event seqs (e.g. an event was lost). If necessary a
+/// timeout might be introduced to allow skipping lost messages.
 pub fn source_events() -> (Receiver<Event>, JoinHandle<()>) {
     use crate::parse_message;
     use std::{
@@ -28,6 +30,7 @@ pub fn source_events() -> (Receiver<Event>, JoinHandle<()>) {
         log::debug!("Source acceptor started");
         let (source_stream, _addr) = source_listener.accept().expect("source connection failed");
         let mut source_reader = BufReader::new(source_stream);
+        // TODO pass to user acceptor to wait until all expected users connect?
         let total_users: usize =
             parse_message(&mut source_reader).expect("failed to read user number");
         log::info!("Total number of users expected {}", total_users);
@@ -76,7 +79,6 @@ mod tests {
     #[test]
     fn route_events() -> Result<()> {
         use std::{io::Write, net::TcpStream};
-
 
         let (receiver, _join_handle) = source_events();
         let mut source_stream = TcpStream::connect("127.0.0.1:9999")?;
