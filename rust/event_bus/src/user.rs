@@ -9,15 +9,19 @@ use std::{
 
 pub type UserStreams = HashMap<UserId, BufStream<TcpStream>>;
 
-pub fn start_user_acceptor(
-    tcp_listener: TcpListener,
-    user_streams: Arc<Mutex<UserStreams>>,
-) -> JoinHandle<()> {
+pub fn start_user_acceptor(user_streams: Arc<Mutex<UserStreams>>) -> JoinHandle<()> {
     use crate::parse_message;
     use std::thread;
 
     thread::spawn(move || {
         log::debug!("User acceptor started");
+        let tcp_listener = TcpListener::bind("127.0.0.1:9990").expect("user listener failed");
+        log::info!(
+            "Started user listener on {}",
+            tcp_listener
+                .local_addr()
+                .expect("failed to get user server address")
+        );
         for stream in tcp_listener.incoming() {
             let stream = stream.expect("user connection failed");
             let mut buf_reader = BufStream::new(stream);
@@ -43,10 +47,8 @@ mod tests {
 
         pretty_env_logger::init();
         let streams = Arc::new(Mutex::new(UserStreams::new()));
-        let listener = TcpListener::bind("localhost:0")?;
-        let server_addr = listener.local_addr()?;
-        let _handle = start_user_acceptor(listener, streams.clone());
-        let mut user_stream = TcpStream::connect(server_addr)?;
+        let _handle = start_user_acceptor(streams.clone());
+        let mut user_stream = TcpStream::connect("127.0.0.1:9990")?;
         user_stream.write_fmt(format_args!("42\n"))?;
 
         // TODO: Limit retry time and not number.

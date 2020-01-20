@@ -33,7 +33,7 @@ where
                     log::trace!("Forwarding to user {:?}", event);
                     writeln!(stream, "{}", event).expect("failed to write event to user stream");
                     // Transmit the event right away without waiting for the buffer to fill.
-                    stream.flush().expect("failed to flush user stream");
+                    stream.flush().expect(&format!("failed to flush user stream for {:?}", event));
                 } else {
                     log::trace!("User not connected, discarding {:?}", event);
                 }
