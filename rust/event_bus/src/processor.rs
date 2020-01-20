@@ -22,9 +22,9 @@ where
         log::debug!("Event processor started");
         for event in events {
             let mut followers = HashMap::<UserId, HashSet<UserId>>::new();
-            let mut blocked = HashMap::<UserId, HashSet<UserId>>::new();
+            let mut blockers = HashMap::<UserId, HashSet<UserId>>::new();
             log::trace!("Processing {:?}", event);
-            process_event(&event, &mut followers, &mut blocked);
+            process_event(&event, &mut followers, &mut blockers);
             if let Some(stream) = user_streams
                 .lock()
                 .expect("failed to acquire user lock")
@@ -41,54 +41,57 @@ where
     })
 }
 
-#[derive(PartialEq, Debug)]
-enum EventTarget<'a> {
-    Users(&'a HashSet<UserId>),
-    User(UserId),
-    NoOne,
-}
-
 /// Processes an event returning IDs of users that should receive it.
-fn process_event<'a>(
+/// * `followers` - Map of users following updates of a given user.
+/// * `blockers` - Map of users blocking a given user.
+fn process_event(
     event: &Event,
-    followers: &'a mut HashMap<UserId, HashSet<UserId>>,
-    blocked: &mut HashMap<UserId, HashSet<UserId>>,
-) -> EventTarget<'a> {
+    followers: &mut HashMap<UserId, HashSet<UserId>>,
+    blockers: &mut HashMap<UserId, HashSet<UserId>>,
+) -> HashSet<UserId> {
     use crate::event::Action::*;
     use std::collections::hash_map::Entry::*;
 
-    match event.action {
+    let target = match event.action {
         Follow(followed_user) => match followers.entry(event.user_id) {
             Occupied(mut entry) => {
                 if entry.get_mut().insert(followed_user) {
-                    EventTarget::User(followed_user)
+                    hashset! {followed_user}
                 } else {
-                    EventTarget::NoOne
+                    hashset! {}
                 }
             }
             Vacant(entry) => {
                 entry.insert(hashset! {followed_user});
-                EventTarget::User(followed_user)
+                hashset! {followed_user}
             }
         },
         Unfollow(unfollowed_user) => {
             followers.entry(event.user_id).and_modify(|e| {
                 e.remove(&unfollowed_user);
             });
-            EventTarget::NoOne
+            hashset! {}
         }
         StatusUpdate(ref _message) => followers
             .get(&event.user_id)
-            .map(|fs| EventTarget::Users(fs))
-            .unwrap_or(EventTarget::NoOne),
-        PrivateMessage(recipient, ref _message) => EventTarget::User(recipient),
+            .unwrap_or(&hashset! {})
+            .clone(),
+        PrivateMessage(recipient, ref _message) => hashset! {recipient},
         Block(blocked_user) => {
-            blocked.entry(event.user_id)
-                .and_modify(|e| {e.insert(blocked_user);})
-                .or_insert(hashset!{blocked_user});
-            EventTarget::NoOne
-        },
-    }
+            blockers
+                .entry(event.user_id)
+                .and_modify(|e| {
+                    e.insert(blocked_user);
+                })
+                .or_insert(hashset! {blocked_user});
+            hashset! {}
+        }
+    };
+
+    blockers
+        .get(&event.user_id)
+        .map(|bs| target.difference(bs).map(|u| *u).collect())
+        .unwrap_or(target)
 }
 
 #[cfg(test)]
@@ -148,10 +151,10 @@ mod tests {
     #[test]
     fn process_follow() {
         let mut followers = HashMap::new();
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::User(7),
+            hashset! {7},
             process_event(
                 &Event {
                     seq: 1,
@@ -159,7 +162,7 @@ mod tests {
                     action: Action::Follow(7),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
         assert_eq!(Some(&hashset! {7}), followers.get(&5));
@@ -169,10 +172,10 @@ mod tests {
     fn process_follow_if_already_following() {
         let mut followers = HashMap::new();
         followers.insert(5, hashset! {7});
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::NoOne,
+            hashset! {},
             process_event(
                 &Event {
                     seq: 1,
@@ -180,7 +183,7 @@ mod tests {
                     action: Action::Follow(7),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
         assert_eq!(Some(&hashset! {7}), followers.get(&5));
@@ -190,10 +193,10 @@ mod tests {
     fn process_follow_second_user() {
         let mut followers = HashMap::new();
         followers.insert(5, hashset! {7});
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::User(9),
+            hashset! {9},
             process_event(
                 &Event {
                     seq: 1,
@@ -201,20 +204,40 @@ mod tests {
                     action: Action::Follow(9),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
         assert_eq!(Some(&hashset! {7, 9}), followers.get(&5));
     }
 
     #[test]
+    fn process_follow_if_blocked() {
+        let mut followers = HashMap::new();
+        let mut blockers = HashMap::new();
+        blockers.insert(5, hashset! {7});
+
+        assert_eq!(
+            hashset! {},
+            process_event(
+                &Event {
+                    seq: 1,
+                    user_id: 5,
+                    action: Action::Follow(7),
+                },
+                &mut followers,
+                &mut blockers
+            )
+        );
+    }
+
+    #[test]
     fn process_unfollow() {
         let mut followers = HashMap::new();
         followers.insert(3, hashset![9]);
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::NoOne,
+            hashset! {},
             process_event(
                 &Event {
                     seq: 2,
@@ -222,7 +245,7 @@ mod tests {
                     action: Action::Unfollow(9),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
         assert_eq!(Some(&HashSet::new()), followers.get(&3));
@@ -231,10 +254,10 @@ mod tests {
     #[test]
     fn process_unfollow_if_not_following() {
         let mut followers = HashMap::new();
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::NoOne,
+            hashset! {},
             process_event(
                 &Event {
                     seq: 2,
@@ -242,7 +265,7 @@ mod tests {
                     action: Action::Unfollow(9),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
     }
@@ -251,10 +274,10 @@ mod tests {
     fn process_status_update() {
         let mut followers = HashMap::new();
         followers.insert(3, hashset! {2, 5});
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::Users(&hashset! {2, 5}),
+            hashset! {2, 5},
             process_event(
                 &Event {
                     seq: 9,
@@ -262,7 +285,7 @@ mod tests {
                     action: Action::StatusUpdate("hello".to_string()),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
     }
@@ -270,10 +293,10 @@ mod tests {
     #[test]
     fn process_status_update_if_no_followers() {
         let mut followers = HashMap::new();
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::NoOne,
+            hashset! {},
             process_event(
                 &Event {
                     seq: 9,
@@ -281,7 +304,28 @@ mod tests {
                     action: Action::StatusUpdate("hello".to_string()),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
+            )
+        );
+    }
+
+    #[test]
+    fn process_status_update_if_blocked() {
+        let mut followers = HashMap::new();
+        followers.insert(3, hashset! {2, 5});
+        let mut blockers = HashMap::new();
+        blockers.insert(3, hashset! {2});
+
+        assert_eq!(
+            hashset! {5},
+            process_event(
+                &Event {
+                    seq: 9,
+                    user_id: 3,
+                    action: Action::StatusUpdate("hello".to_string()),
+                },
+                &mut followers,
+                &mut blockers
             )
         );
     }
@@ -289,10 +333,10 @@ mod tests {
     #[test]
     fn process_private_message() {
         let mut followers = HashMap::new();
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::User(7),
+            hashset! {7},
             process_event(
                 &Event {
                     seq: 9,
@@ -300,7 +344,27 @@ mod tests {
                     action: Action::PrivateMessage(7, "hi".to_string()),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
+            )
+        );
+    }
+
+    #[test]
+    fn process_private_message_if_blocked() {
+        let mut followers = HashMap::new();
+        let mut blockers = HashMap::new();
+        blockers.insert(3, hashset! {7});
+
+        assert_eq!(
+            hashset! {},
+            process_event(
+                &Event {
+                    seq: 9,
+                    user_id: 3,
+                    action: Action::PrivateMessage(7, "hi".to_string()),
+                },
+                &mut followers,
+                &mut blockers
             )
         );
     }
@@ -308,10 +372,10 @@ mod tests {
     #[test]
     fn process_block() {
         let mut followers = HashMap::new();
-        let mut blocked = HashMap::new();
+        let mut blockers = HashMap::new();
 
         assert_eq!(
-            EventTarget::NoOne,
+            hashset! {},
             process_event(
                 &Event {
                     seq: 3,
@@ -319,20 +383,20 @@ mod tests {
                     action: Action::Block(7),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
-        assert_eq!(Some(&hashset!{7}), blocked.get(&5));
+        assert_eq!(Some(&hashset! {7}), blockers.get(&5));
     }
 
     #[test]
     fn process_block_second_user() {
         let mut followers = HashMap::new();
-        let mut blocked = HashMap::new();
-        blocked.insert(2, hashset!{5});
+        let mut blockers = HashMap::new();
+        blockers.insert(2, hashset! {5});
 
         assert_eq!(
-            EventTarget::NoOne,
+            hashset! {},
             process_event(
                 &Event {
                     seq: 3,
@@ -340,10 +404,9 @@ mod tests {
                     action: Action::Block(7),
                 },
                 &mut followers,
-                &mut blocked
+                &mut blockers
             )
         );
-        assert_eq!(Some(&hashset!{5, 7}), blocked.get(&2));
+        assert_eq!(Some(&hashset! {5, 7}), blockers.get(&2));
     }
-
 }
