@@ -30,6 +30,7 @@ where
                     .expect("failed to acquire user lock")
                     .get_mut(&recipient)
                 {
+                    // TODO remove user stream from the map if connection is broken
                     log::trace!("Forwarding to user {:?}", event);
                     writeln!(stream, "{}", event).expect("failed to write event to user stream");
                     // Transmit the event right away without waiting for the buffer to fill.
@@ -56,16 +57,16 @@ fn process_event(
     use std::collections::hash_map::Entry::*;
 
     let target = match event.action {
-        Follow(followed_user) => match followers.entry(event.user_id) {
+        Follow(followed_user) => match followers.entry(followed_user) {
             Occupied(mut entry) => {
-                if entry.get_mut().insert(followed_user) {
+                if entry.get_mut().insert(event.user_id) {
                     hashset! {followed_user}
                 } else {
                     hashset! {}
                 }
             }
             Vacant(entry) => {
-                entry.insert(hashset! {followed_user});
+                entry.insert(hashset! {event.user_id});
                 hashset! {followed_user}
             }
         },
@@ -192,13 +193,13 @@ mod tests {
                 &mut blockers
             )
         );
-        assert_eq!(Some(&hashset! {7}), followers.get(&5));
+        assert_eq!(Some(&hashset! {5}), followers.get(&7));
     }
 
     #[test]
     fn process_follow_if_already_following() {
         let mut followers = HashMap::new();
-        followers.insert(5, hashset! {7});
+        followers.insert(7, hashset! {5});
         let mut blockers = HashMap::new();
 
         assert_eq!(
@@ -213,13 +214,13 @@ mod tests {
                 &mut blockers
             )
         );
-        assert_eq!(Some(&hashset! {7}), followers.get(&5));
+        assert_eq!(Some(&hashset! {5}), followers.get(&7));
     }
 
     #[test]
-    fn process_follow_second_user() {
+    fn process_follow_second_follower() {
         let mut followers = HashMap::new();
-        followers.insert(5, hashset! {7});
+        followers.insert(9, hashset! {7});
         let mut blockers = HashMap::new();
 
         assert_eq!(
@@ -234,7 +235,7 @@ mod tests {
                 &mut blockers
             )
         );
-        assert_eq!(Some(&hashset! {7, 9}), followers.get(&5));
+        assert_eq!(Some(&hashset! {5, 7}), followers.get(&9));
     }
 
     #[test]

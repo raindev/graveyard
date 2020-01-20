@@ -46,14 +46,13 @@ mod tests {
     fn accept_user_connection() -> Result<()> {
         use std::io::Write;
 
-        pretty_env_logger::init();
         let streams = Arc::new(Mutex::new(UserStreams::new()));
         let _handle = start_user_acceptor(streams.clone());
         let mut user_stream = TcpStream::connect("127.0.0.1:9990")?;
         user_stream.write_fmt(format_args!("42\n"))?;
 
         // TODO: Limit retry time and not number.
-        let mut retries = 100;
+        let mut retries = 5000;
         while retries > 0 && streams.lock().unwrap().get(&42).is_none() {
             retries -= 1;
         }

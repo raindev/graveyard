@@ -11,7 +11,7 @@ type Result<T> = std::result::Result<T, Error>;
 type SeqNo = u64;
 
 /// Represent an event related to user action.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Event {
     /// Event sequence number.
     /// Represents its position in the global order of events.
@@ -25,7 +25,7 @@ pub struct Event {
 type Message = String;
 
 /// Represents an action taken by a user.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Action {
     Follow(UserId),
     Unfollow(UserId),
