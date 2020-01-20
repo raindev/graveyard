@@ -115,15 +115,13 @@ mod tests {
         })?;
         // close the channel after sending the event
         drop(sender);
+        // wait for the processor to finish and propagate panic from the processor thread
+        handle.join().unwrap();
 
-        // TODO: Replace with a timed retry.
-        std::thread::sleep(std::time::Duration::from_secs(1));
         let user_stream = user_streams.lock().unwrap();
         let message = String::from_utf8(user_stream.get(&42).unwrap().get_ref().clone())?;
         assert_eq!("5/S/42/hello\n", message);
 
-        // wait for the processor to finish and propagate panic from the processor thread
-        handle.join().unwrap();
         Ok(())
     }
 
@@ -142,7 +140,6 @@ mod tests {
         })?;
         // close the channel after sending the event
         drop(sender);
-
         // wait for the processor to finish and propagate panic from the processor thread
         handle.join().unwrap();
         Ok(())
