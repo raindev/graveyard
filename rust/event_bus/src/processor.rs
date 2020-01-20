@@ -21,9 +21,9 @@ where
 
     thread::spawn(move || {
         log::debug!("Event processor started");
+        let mut followers = HashMap::<UserId, HashSet<UserId>>::new();
+        let mut blockers = HashMap::<UserId, HashSet<UserId>>::new();
         for event in events {
-            let mut followers = HashMap::<UserId, HashSet<UserId>>::new();
-            let mut blockers = HashMap::<UserId, HashSet<UserId>>::new();
             log::trace!("Processing {:?}", event);
             for recipient in process_event(&event, &mut followers, &mut blockers) {
                 if let Some(stream) = user_streams
