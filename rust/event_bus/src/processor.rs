@@ -33,7 +33,9 @@ where
                     log::trace!("Forwarding to user {:?}", event);
                     writeln!(stream, "{}", event).expect("failed to write event to user stream");
                     // Transmit the event right away without waiting for the buffer to fill.
-                    stream.flush().expect(&format!("failed to flush user stream for {:?}", event));
+                    stream
+                        .flush()
+                        .unwrap_or_else(|_| panic!("failed to flush user stream for {:?}", event));
                 } else {
                     log::trace!("User not connected, discarding {:?}", event);
                 }
@@ -91,14 +93,17 @@ fn process_event(
 
     blockers
         .get(&event.user_id)
-        .map(|bs| target.difference(bs).map(|u| *u).collect())
+        .map(|bs| target.difference(bs).copied().collect())
         .unwrap_or(target)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{event::{Action, Event}, Result};
+    use crate::{
+        event::{Action, Event},
+        Result,
+    };
     use std::{io::BufWriter, sync::mpsc};
 
     #[test]

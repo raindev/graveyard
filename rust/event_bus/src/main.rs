@@ -5,9 +5,7 @@ fn main() -> Result<()> {
         processor::process_events, source::source_events, user::start_user_acceptor,
         user::UserStreams,
     };
-    use std::{
-        sync::{Arc, Mutex},
-    };
+    use std::sync::{Arc, Mutex};
 
     pretty_env_logger::init();
 
@@ -19,11 +17,7 @@ fn main() -> Result<()> {
     source_handle
         .join()
         .expect("processing events from the source failed");
-    processor_handle
-        .join()
-        .expect("event processor failed");
-    user_handle
-        .join()
-        .expect("user connection acceptor failed");
+    processor_handle.join().expect("event processor failed");
+    user_handle.join().expect("user connection acceptor failed");
     Ok(())
 }
