@@ -1,6 +1,5 @@
 use crate::event::Event;
 use std::{
-    io::Read,
     sync::{mpsc, mpsc::Receiver},
     thread::JoinHandle,
 };
@@ -9,14 +8,29 @@ use std::{
 const EXPECTED_EVENT_COUNT: usize = 1_000_000;
 
 /// Processes stream of source events.
-pub fn source_events<R: 'static + Read + Send>(events: R) -> (Receiver<Event>, JoinHandle<()>) {
-    use std::{io::BufRead, io::BufReader, str::FromStr, thread};
+pub fn source_events() -> (Receiver<Event>, JoinHandle<()>) {
+    use crate::parse_message;
+    use std::{io::BufRead, io::BufReader, net::TcpListener, str::FromStr, thread};
+
+    let source_listener = TcpListener::bind("127.0.0.1:9999").expect("source listener failed");
+    log::info!(
+        "Started source listener on {}",
+        source_listener
+            .local_addr()
+            .expect("failed to get source server address")
+    );
 
     let (sender, receiver) = mpsc::channel();
     let handle = thread::spawn(move || {
         log::debug!("Source acceptor started");
+        let (source_stream, _addr) = source_listener.accept().expect("source connection failed");
+        let mut source_reader = BufReader::new(source_stream);
+        let total_users: usize =
+            parse_message(&mut source_reader).expect("failed to read user number");
+        log::info!("Total number of users expected {}", total_users);
+
         let mut event_count = 0;
-        for event_line in BufReader::new(events).lines() {
+        for event_line in source_reader.lines() {
             let event_line = event_line.expect("failed to read event from source");
             let event = Event::from_str(&event_line).expect("failed to parse event");
             log::trace!("Received event from source: {:?}", event);
@@ -38,9 +52,20 @@ pub fn source_events<R: 'static + Read + Send>(events: R) -> (Receiver<Event>, J
     (receiver, handle)
 }
 
-#[test]
-fn route_events() {
-    let (receiver, _join_handle) = source_events("6/F/2/3\n7/U/2/3".as_bytes());
-    assert!(receiver.recv().is_ok());
-    assert!(receiver.recv().is_ok());
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Result;
+
+    #[test]
+    fn route_events() -> Result<()> {
+        use std::{io::Write, net::TcpStream};
+
+        let (receiver, _join_handle) = source_events();
+        let mut source_stream = TcpStream::connect("127.0.0.1:9999")?;
+        write!(&mut source_stream, "10\n6/F/2/3\n7/U/2/3\n")?;
+        assert!(receiver.recv().is_ok());
+        assert!(receiver.recv().is_ok());
+        Ok(())
+    }
 }

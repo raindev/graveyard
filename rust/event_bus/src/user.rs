@@ -13,15 +13,16 @@ pub fn start_user_acceptor(user_streams: Arc<Mutex<UserStreams>>) -> JoinHandle<
     use crate::parse_message;
     use std::thread;
 
+    let tcp_listener = TcpListener::bind("127.0.0.1:9990").expect("user listener failed");
+    log::info!(
+        "Started user listener on {}",
+        tcp_listener
+            .local_addr()
+            .expect("failed to get user server address")
+    );
+
     thread::spawn(move || {
         log::debug!("User acceptor started");
-        let tcp_listener = TcpListener::bind("127.0.0.1:9990").expect("user listener failed");
-        log::info!(
-            "Started user listener on {}",
-            tcp_listener
-                .local_addr()
-                .expect("failed to get user server address")
-        );
         for stream in tcp_listener.incoming() {
             let stream = stream.expect("user connection failed");
             let mut buf_reader = BufStream::new(stream);
