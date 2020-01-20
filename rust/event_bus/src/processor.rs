@@ -24,18 +24,19 @@ where
             let mut followers = HashMap::<UserId, HashSet<UserId>>::new();
             let mut blockers = HashMap::<UserId, HashSet<UserId>>::new();
             log::trace!("Processing {:?}", event);
-            process_event(&event, &mut followers, &mut blockers);
-            if let Some(stream) = user_streams
-                .lock()
-                .expect("failed to acquire user lock")
-                .get_mut(&event.user_id)
-            {
-                log::trace!("Forwarding to user {:?}", event);
-                writeln!(stream, "{}", event).expect("failed to write event to user stream");
-                // Transmit the event right away without waiting for the buffer to fill.
-                stream.flush().expect("failed to flush user stream");
-            } else {
-                log::trace!("User not connected, discarding {:?}", event);
+            for recipient in process_event(&event, &mut followers, &mut blockers) {
+                if let Some(stream) = user_streams
+                    .lock()
+                    .expect("failed to acquire user lock")
+                    .get_mut(&recipient)
+                {
+                    log::trace!("Forwarding to user {:?}", event);
+                    writeln!(stream, "{}", event).expect("failed to write event to user stream");
+                    // Transmit the event right away without waiting for the buffer to fill.
+                    stream.flush().expect("failed to flush user stream");
+                } else {
+                    log::trace!("User not connected, discarding {:?}", event);
+                }
             }
         }
     })
@@ -97,13 +98,54 @@ fn process_event(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{event::Action, Result};
+    use crate::{event::{Action, Event}, Result};
+    use std::{io::BufWriter, sync::mpsc};
 
     #[test]
     fn forward_event() -> Result<()> {
-        use crate::event::Event;
-        use std::{io::BufWriter, sync::mpsc};
+        let (sender, receiver) = mpsc::channel();
+        let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
+        user_streams
+            .lock()
+            .unwrap()
+            .insert(7, BufWriter::new(Vec::new()));
+        let handle = process_events(receiver, user_streams.clone());
+        sender.send(Event {
+            seq: 5,
+            user_id: 42,
+            action: Action::PrivateMessage(7, "hello".to_string()),
+        })?;
+        // close the channel after sending the event
+        drop(sender);
+        // wait for the processor to finish and propagate panic from the processor thread
+        handle.join().unwrap();
 
+        let user_stream = user_streams.lock().unwrap();
+        let message = String::from_utf8(user_stream.get(&7).unwrap().get_ref().clone())?;
+        assert_eq!("5/P/42/7/hello\n", message);
+
+        Ok(())
+    }
+
+    #[test]
+    fn drop_event_if_user_offline() -> Result<()> {
+        let (sender, receiver) = mpsc::channel();
+        let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
+        let handle = process_events(receiver, user_streams.clone());
+        sender.send(Event {
+            seq: 5,
+            user_id: 42,
+            action: Action::StatusUpdate("hello".to_string()),
+        })?;
+        // close the channel after sending the event
+        drop(sender);
+        // wait for the processor to finish and propagate panic from the processor thread
+        handle.join().unwrap();
+        Ok(())
+    }
+
+    #[test]
+    fn process_event_without_forwarding() -> Result<()> {
         let (sender, receiver) = mpsc::channel();
         let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
         user_streams
@@ -114,7 +156,7 @@ mod tests {
         sender.send(Event {
             seq: 5,
             user_id: 42,
-            action: Action::StatusUpdate("hello".to_string()),
+            action: Action::Block(7),
         })?;
         // close the channel after sending the event
         drop(sender);
@@ -123,28 +165,8 @@ mod tests {
 
         let user_stream = user_streams.lock().unwrap();
         let message = String::from_utf8(user_stream.get(&42).unwrap().get_ref().clone())?;
-        assert_eq!("5/S/42/hello\n", message);
+        assert_eq!("", message);
 
-        Ok(())
-    }
-
-    #[test]
-    fn drop_event_if_user_offline() -> Result<()> {
-        use crate::event::Event;
-        use std::{io::BufWriter, sync::mpsc};
-
-        let (sender, receiver) = mpsc::channel();
-        let user_streams = Arc::new(Mutex::new(HashMap::<UserId, BufWriter<Vec<u8>>>::new()));
-        let handle = process_events(receiver, user_streams.clone());
-        sender.send(Event {
-            seq: 5,
-            user_id: 42,
-            action: Action::StatusUpdate("hello".to_string()),
-        })?;
-        // close the channel after sending the event
-        drop(sender);
-        // wait for the processor to finish and propagate panic from the processor thread
-        handle.join().unwrap();
         Ok(())
     }
 
