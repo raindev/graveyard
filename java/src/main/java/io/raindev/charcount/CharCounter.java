@@ -1,4 +1,4 @@
-package io.raindev.transfers;
+package io.raindev.charcount;
 
 import javax.annotation.Nonnull;
 import java.util.Map;

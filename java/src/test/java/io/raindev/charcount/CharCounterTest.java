@@ -1,4 +1,4 @@
-package io.raindev.transfers;
+package io.raindev.charcount;
 
 import org.junit.jupiter.api.Test;
 
@@ -16,9 +16,7 @@ class CharCounterTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void nullString() {
-        assertThrows(NullPointerException.class, () -> {
-            CharCounter.countCharacters(null);
-        });
+        assertThrows(NullPointerException.class, () -> CharCounter.countCharacters(null));
     }
 
     @Test
