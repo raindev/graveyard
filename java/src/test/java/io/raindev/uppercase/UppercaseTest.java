@@ -28,7 +28,12 @@ class UppercaseTest {
 
     @Test
     public void trailingSpace() {
-        assertEquals("hey ", Uppercase.of3Letters("HEY "));
+        assertEquals("HEY ", Uppercase.of3Letters("hey "));
+    }
+
+    @Test
+    public void alreadyUppercase() {
+        assertEquals("OH HEY HELLO", Uppercase.of3Letters("OH HEY HELLO"));
     }
 
     @Test
