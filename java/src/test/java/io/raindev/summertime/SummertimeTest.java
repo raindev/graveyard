@@ -40,11 +40,16 @@ class SummertimeTest {
 	assertEquals(Optional.of(2), summerStart(asList(9., 5., 13., 10., 14., 21.)));
     }
 
+    @Test public void summerStartsFromThreshold() {
+	assertEquals(Optional.of(3), summerStart(asList(3., 5., 2., 5., 9.)));
+    }
+
     @Test public void noSummer() {
 	assertEquals(Optional.empty(), summerStart(asList(18., 17., 15.)));
     }
 
-    @Test public void noWithARiseBelowThreshold() {
+    @Test public void noSummerWithARiseBelowThreshold() {
 	assertEquals(Optional.empty(), summerStart(asList(18., 12., 15., 13.)));
     }
+
 }
