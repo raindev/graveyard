@@ -18,6 +18,8 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.adarshr.test-logger'
 
+    sourceCompatibility = 14
+
     compileJava {
         options.compilerArgs << '-Xlint:unchecked'
     }
