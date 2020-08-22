@@ -4,13 +4,13 @@ plugins {
 
 allprojects {
 
-  wrapper {
-    gradleVersion = '6.6'
-  }
+    wrapper {
+        gradleVersion = '6.6'
+    }
 
-  repositories {
-    jcenter()
-  }
+    repositories {
+        jcenter()
+    }
 
 }
 
