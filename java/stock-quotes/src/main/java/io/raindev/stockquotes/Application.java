@@ -18,15 +18,17 @@ class Application {
     }
 
     @Bean
-    InstrumentSource sourceInstruments(ObjectMapper objectMapper) {
-        return new InstrumentSource(objectMapper, Collections.emptyList());
+    JsonWebSocketConsumer<InstrumentMessage> instrumentConsumer(ObjectMapper objectMapper) {
+        return new JsonWebSocketConsumer<>(InstrumentMessage.class, objectMapper,
+            Collections.emptyList());
     }
 
     @Bean
-    WebSocketConnectionManager instrumentSourceConnectionManager(
-        @Value("${sources.instruments.uri}") String sourceUri, InstrumentSource instrumentSource) {
+    WebSocketConnectionManager instrumentConnectionManager(
+        @Value("${sources.instruments.uri}") String sourceUri,
+        JsonWebSocketConsumer<InstrumentMessage> instrumentConsumer) {
         final var webSocketConnectionManager = new WebSocketConnectionManager(
-            new StandardWebSocketClient(), instrumentSource, sourceUri);
+            new StandardWebSocketClient(), instrumentConsumer, sourceUri);
         webSocketConnectionManager.setAutoStartup(true);
         return webSocketConnectionManager;
     }

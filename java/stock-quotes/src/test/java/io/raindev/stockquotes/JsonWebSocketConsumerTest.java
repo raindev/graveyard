@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-class InstrumentSourceTest {
+class JsonWebSocketConsumerTest {
 
     ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -24,10 +24,13 @@ class InstrumentSourceTest {
         var message = new InstrumentMessage(InstrumentMessage.Type.ADD,
             new InstrumentMessage.Data("description", "isin"));
         var messageReceived = new AtomicBoolean(false);
-        var source = new InstrumentSource(jsonMapper, Collections.singleton(m -> {
-            assertEquals(message, m, "the original message should be forwarded");
-            messageReceived.set(true);
-        }));
+        var source = new JsonWebSocketConsumer<>(
+            InstrumentMessage.class,
+            jsonMapper,
+            Collections.singleton(m -> {
+                assertEquals(message, m, "the original message should be forwarded");
+                messageReceived.set(true);
+            }));
 
         source.handleTextMessage(mock(WebSocketSession.class),
             new TextMessage(jsonMapper.writeValueAsString(message)));
@@ -41,7 +44,7 @@ class InstrumentSourceTest {
         var secondHandlerMessageReceived = new AtomicBoolean(false);
         var message = new InstrumentMessage(InstrumentMessage.Type.ADD,
             new InstrumentMessage.Data("description", "isin"));
-        var source = new InstrumentSource(jsonMapper, Arrays.asList(
+        var source = new JsonWebSocketConsumer<>(InstrumentMessage.class, jsonMapper, Arrays.asList(
             m -> firstHandleMessageReceived.set(true),
             m -> secondHandlerMessageReceived.set(true)
         ));
@@ -58,9 +61,10 @@ class InstrumentSourceTest {
         var forwardedMessageCount = new AtomicInteger(0);
         var message = new InstrumentMessage(InstrumentMessage.Type.DELETE,
             new InstrumentMessage.Data("description", "isin"));
-        var source = new InstrumentSource(jsonMapper, Collections.singleton(
-            m -> forwardedMessageCount.incrementAndGet()
-        ));
+        var source = new JsonWebSocketConsumer<>(InstrumentMessage.class, jsonMapper,
+            Collections.singleton(
+                m -> forwardedMessageCount.incrementAndGet()
+            ));
 
         var messageJson = jsonMapper.writeValueAsString(message);
         source.handleTextMessage(mock(WebSocketSession.class), new TextMessage(messageJson));

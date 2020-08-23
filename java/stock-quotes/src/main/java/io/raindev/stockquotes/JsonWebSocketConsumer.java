@@ -9,13 +9,16 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-final class InstrumentSource extends TextWebSocketHandler {
+final class JsonWebSocketConsumer<M> extends TextWebSocketHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(InstrumentSource.class);
+    private static final Logger log = LoggerFactory.getLogger(JsonWebSocketConsumer.class);
+    private final Class<M> messageClass;
     private final ObjectMapper jsonMapper;
-    private final Iterable<InstrumentMessageHandler> messageHandlers;
+    private final Iterable<MessageHandler<M>> messageHandlers;
 
-    InstrumentSource(ObjectMapper jsonMapper, Iterable<InstrumentMessageHandler> messageHandlers) {
+    JsonWebSocketConsumer(Class<M> messageClass, ObjectMapper jsonMapper,
+                          Iterable<MessageHandler<M>> messageHandlers) {
+        this.messageClass = messageClass;
         this.jsonMapper = jsonMapper;
         this.messageHandlers = messageHandlers;
     }
@@ -24,8 +27,7 @@ final class InstrumentSource extends TextWebSocketHandler {
     protected void handleTextMessage(@NonNull WebSocketSession session, TextMessage message) {
         log.trace("Instrument message received:\n" + message.getPayload());
         try {
-            final var parsedMessage = jsonMapper.readValue(message.getPayload(),
-                InstrumentMessage.class);
+            final var parsedMessage = jsonMapper.readValue(message.getPayload(), messageClass);
             messageHandlers.forEach(h -> h.handle(parsedMessage));
         } catch (JsonProcessingException e) {
             log.error("Failed to parse instrument message", e);
