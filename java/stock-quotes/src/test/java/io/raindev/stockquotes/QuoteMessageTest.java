@@ -2,7 +2,6 @@ package io.raindev.stockquotes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,16 +9,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.context.annotation.Configuration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-// Allows to make sure JSON parsing works as expected with actual ObjectMapper
-// configuration (without bringing up the whole application).
 @JsonTest
-class InstrumentMessageTest {
+class QuoteMessageTest {
 
-    // Replace the application configuration with an empty one.
     @Configuration
     static class TestConfiguration {
     }
@@ -30,16 +27,16 @@ class InstrumentMessageTest {
     void parseFromJson() throws JsonProcessingException {
         var json = "{" +
             "  \"data\": {" +
-            "    \"description\": \"description\"," +
-            "    \"isin\": \"ISIN\"" +
+            "    \"price\": 99.99," +
+            "    \"isin\": \"isin\"" +
             "  }," +
-            "  \"type\": \"ADD\"" +
+            "  \"type\": \"QUOTE\"" +
             "}";
 
         assertEquals(
-            jsonMapper.readValue(json, InstrumentMessage.class),
-            new InstrumentMessage(InstrumentMessage.Type.ADD,
-                new InstrumentMessage.Data("description", "ISIN")));
+            jsonMapper.readValue(json, QuoteMessage.class),
+            new QuoteMessage(QuoteMessage.Type.QUOTE,
+                new QuoteMessage.Data(99.99, "isin")));
     }
 
     @ParameterizedTest
@@ -47,35 +44,35 @@ class InstrumentMessageTest {
     void requireAllFields(String fieldName) throws JsonProcessingException {
         var fullJson = "{" +
             "  \"data\": {" +
-            "    \"description\": \"description\"," +
+            "    \"price\": 5.70," +
             "    \"isin\": \"ISIN\"" +
             "  }," +
-            "  \"type\": \"DELETE\"" +
+            "  \"type\": \"QUOTE\"" +
             "}";
         var jsonObject = (ObjectNode) jsonMapper.readTree(fullJson);
         jsonObject.remove(fieldName);
         var jsonWithoutField = jsonObject.toString();
 
         assertThrows(JsonMappingException.class, () -> jsonMapper.readValue(jsonWithoutField,
-            InstrumentMessage.class));
+            QuoteMessage.class));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"description", "isin"})
+    @ValueSource(strings = {"price", "isin"})
     void requireAllDataFields(String fieldName) throws JsonProcessingException {
         var fullJson = "{" +
             "  \"data\": {" +
-            "    \"description\": \"description\"," +
+            "    \"price\": 5.70," +
             "    \"isin\": \"ISIN\"" +
             "  }," +
-            "  \"type\": \"DELETE\"" +
+            "  \"type\": \"QUOTE\"" +
             "}";
         var jsonObject = (ObjectNode) jsonMapper.readTree(fullJson);
         ((ObjectNode) jsonObject.get("data")).remove(fieldName);
         var jsonWithoutField = jsonObject.toString();
 
         assertThrows(JsonMappingException.class, () -> jsonMapper.readValue(jsonWithoutField,
-            InstrumentMessage.class));
+            QuoteMessage.class));
     }
 
 }

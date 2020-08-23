@@ -59,9 +59,9 @@ class JsonWebSocketConsumerTest {
     @Test
     void forwardAllMessages() throws JsonProcessingException {
         var forwardedMessageCount = new AtomicInteger(0);
-        var message = new InstrumentMessage(InstrumentMessage.Type.DELETE,
-            new InstrumentMessage.Data("description", "isin"));
-        var source = new JsonWebSocketConsumer<>(InstrumentMessage.class, jsonMapper,
+        var message = new QuoteMessage(QuoteMessage.Type.QUOTE,
+            new QuoteMessage.Data(22.53, "isin"));
+        var source = new JsonWebSocketConsumer<>(QuoteMessage.class, jsonMapper,
             Collections.singleton(
                 m -> forwardedMessageCount.incrementAndGet()
             ));

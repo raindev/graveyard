@@ -8,8 +8,11 @@ import org.springframework.web.socket.client.WebSocketConnectionManager;
 @SpringBootTest
 class ApplicationTest {
 
-    @MockBean
-    WebSocketConnectionManager instrumentSourceConnectionManager;
+    @MockBean(name = "instrumentConnectionManager")
+    WebSocketConnectionManager instrumentConnectionManager;
+
+    @MockBean(name = "quoteConnectionManager")
+    WebSocketConnectionManager quoteConnectionManager;
 
     @Test
     void contextLoads() {
