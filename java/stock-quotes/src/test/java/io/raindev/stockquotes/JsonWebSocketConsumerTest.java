@@ -11,8 +11,7 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 class JsonWebSocketConsumerTest {
@@ -72,6 +71,13 @@ class JsonWebSocketConsumerTest {
         source.handleTextMessage(mock(WebSocketSession.class), new TextMessage(messageJson));
 
         assertEquals(3, forwardedMessageCount.get(), "all messages should be forwarded");
+    }
+
+    @Test
+    void skipMalformedMessages() {
+        new JsonWebSocketConsumer<>(QuoteMessage.class, jsonMapper, Collections.singleton(
+            message -> fail("No message is expected")
+        )).handleTextMessage(mock(WebSocketSession.class), new TextMessage("malformedJsonMessage"));
     }
 
 }
