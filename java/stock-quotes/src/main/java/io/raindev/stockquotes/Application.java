@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @SpringBootApplication
@@ -22,15 +23,26 @@ class Application {
     }
 
     @Bean
-    JsonWebSocketConsumer<InstrumentMessage> instrumentConsumer(ObjectMapper objectMapper) {
-        return new JsonWebSocketConsumer<>(InstrumentMessage.class, objectMapper,
-            Collections.singleton(message -> log.info("Message received: " + message)));
+    CurrentPrices currentPrices() {
+        return new CurrentPrices();
     }
 
     @Bean
-    JsonWebSocketConsumer<QuoteMessage> quoteConsumer(ObjectMapper objectMapper) {
+    JsonWebSocketConsumer<InstrumentMessage> instrumentConsumer(CurrentPrices currentPrices,
+                                                                ObjectMapper objectMapper) {
+        return new JsonWebSocketConsumer<>(InstrumentMessage.class, objectMapper,
+            Arrays.asList(
+                message -> log.trace("Instrument message received: " + message),
+                currentPrices::handle));
+    }
+
+    @Bean
+    JsonWebSocketConsumer<QuoteMessage> quoteConsumer(CurrentPrices currentPrices,
+                                                      ObjectMapper objectMapper) {
         return new JsonWebSocketConsumer<>(QuoteMessage.class, objectMapper,
-            Collections.singleton(message -> log.info("Message received: " + message)));
+            Arrays.asList(
+                message -> log.trace("Quote received: " + message),
+                currentPrices::handle));
     }
 
     @Bean("instrumentConnectionManager")
