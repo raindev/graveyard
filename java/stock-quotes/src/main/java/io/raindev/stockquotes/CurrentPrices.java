@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class CurrentPrices {
     private final Map<String, InstrumentPrice> pricesByIsin = new ConcurrentHashMap<>();
 
+    // TODO handle removals
     void handle(InstrumentMessage message) {
         pricesByIsin.computeIfAbsent(message.getData().getIsin(), isin ->
             new InstrumentPrice(isin, message.getData().getDescription(), Optional.empty()));

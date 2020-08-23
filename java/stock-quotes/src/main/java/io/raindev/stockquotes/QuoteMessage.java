@@ -16,17 +16,17 @@ public class QuoteMessage {
         private final double price;
         private final String isin;
 
-        Data(@JsonProperty(value = "price", required = true) double price,
-             @JsonProperty(value = "isin", required = true) String isin) {
+        Data(@JsonProperty(value = "isin", required = true) String isin,
+             @JsonProperty(value = "price", required = true) double price) {
             this.price = price;
             this.isin = isin;
         }
 
-        public String getIsin() {
+        String getIsin() {
             return isin;
         }
 
-        public double getPrice() {
+        double getPrice() {
             return price;
         }
 
@@ -56,17 +56,17 @@ public class QuoteMessage {
     private final Type type;
     private final Data data;
 
-    public QuoteMessage(@JsonProperty(value = "type", required = true) Type type,
+    QuoteMessage(@JsonProperty(value = "type", required = true) Type type,
                         @JsonProperty(value = "data", required = true) Data data) {
         this.type = type;
         this.data = data;
     }
 
-    public Type getType() {
+    Type getType() {
         return type;
     }
 
-    public Data getData() {
+    Data getData() {
         return data;
     }
 

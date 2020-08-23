@@ -35,13 +35,13 @@ class CurrentPricesTest {
         currentPrices.handle(new InstrumentMessage(InstrumentMessage.Type.ADD,
             new InstrumentMessage.Data("description2", "isin2")));
         currentPrices.handle(new QuoteMessage(QuoteMessage.Type.QUOTE,
-            new QuoteMessage.Data(92.93, "isin2")));
+            new QuoteMessage.Data("isin2", 92.93)));
         currentPrices.handle(new QuoteMessage(QuoteMessage.Type.QUOTE,
-            new QuoteMessage.Data(5.67, "isin1")));
+            new QuoteMessage.Data("isin1", 5.67)));
         currentPrices.handle(new InstrumentMessage(InstrumentMessage.Type.ADD,
             new InstrumentMessage.Data("description3", "isin3")));
         currentPrices.handle(new QuoteMessage(QuoteMessage.Type.QUOTE,
-            new QuoteMessage.Data(12.1937, "isin3")));
+            new QuoteMessage.Data("isin3", 12.1937)));
 
         assertThat(currentPrices.list())
             .containsExactlyInAnyOrder(

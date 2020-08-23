@@ -59,7 +59,7 @@ class JsonWebSocketConsumerTest {
     void forwardAllMessages() throws JsonProcessingException {
         var forwardedMessageCount = new AtomicInteger(0);
         var message = new QuoteMessage(QuoteMessage.Type.QUOTE,
-            new QuoteMessage.Data(22.53, "isin"));
+            new QuoteMessage.Data("isin", 22.53));
         var source = new JsonWebSocketConsumer<>(QuoteMessage.class, jsonMapper,
             Collections.singleton(
                 m -> forwardedMessageCount.incrementAndGet()

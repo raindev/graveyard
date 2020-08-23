@@ -36,7 +36,7 @@ class QuoteMessageTest {
         assertEquals(
             jsonMapper.readValue(json, QuoteMessage.class),
             new QuoteMessage(QuoteMessage.Type.QUOTE,
-                new QuoteMessage.Data(99.99, "isin")));
+                new QuoteMessage.Data("isin", 99.99)));
     }
 
     @ParameterizedTest
