@@ -1,5 +1,19 @@
 # Stock Quotes
 
+## Testing and running the service
+
+Initialize Gradlew wrapper:
+
+`gradle wrapper`
+
+Compile and run tests:
+
+`./gradlew build`
+
+Run the service:
+`./gradlew bootRun`
+
+
 ## Order of event processing
 
 The functionality provided by the service is backed by an agregated view of the data from two incoming streams. The streams are delivered via independent channels (separate web-socket connections), so there's no ordering relationship between messages of the two streams. Given consistently assigned timestamps for stream messages, it would be possible to process messages of both streams in order. This would necessitate a delay in processing, to introduce a window of time within which messages of one stream might be delayed in relation to the other stream. Because the partners do not provide message timestamps, the streams will have to be processed in real-time order, as the data is received.
@@ -19,7 +33,3 @@ For the simplicities sake, the implementation will discard quotes for non-existe
 ## Price history
 
 The removal of old candles, as well as the creation of new ones, is triggered by incoming Quote messages. This means that the old candles will be kept around if no new quotes are received for a period of time longer than the duration of retained history. If this impacts memory usage significantly, removal of no longer needed data can be done with a background cleanup thread.
-
-## Volatile instruments detection
-
-TODO
