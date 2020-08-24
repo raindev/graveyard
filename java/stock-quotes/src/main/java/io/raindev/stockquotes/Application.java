@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
 import java.time.Clock;
 import java.util.Arrays;
@@ -29,6 +30,11 @@ class Application {
     }
 
     @Bean
+    HotInstrumentDetector hotInstrumentDetector(HotInstrumentWebSocketHandler webSocketHandler) {
+        return new HotInstrumentDetector(webSocketHandler::send);
+    }
+
+    @Bean
     JsonWebSocketConsumer<InstrumentMessage> instrumentConsumer(CurrentPrices currentPrices,
                                                                 PriceHistory priceHistory,
                                                                 ObjectMapper objectMapper) {
@@ -41,11 +47,13 @@ class Application {
     @Bean
     JsonWebSocketConsumer<QuoteMessage> quoteConsumer(CurrentPrices currentPrices,
                                                       PriceHistory priceHistory,
-                                                      ObjectMapper objectMapper) {
+                                                      ObjectMapper objectMapper,
+                                                      HotInstrumentDetector hotInstrumentDetector) {
         return new JsonWebSocketConsumer<>(QuoteMessage.class, objectMapper,
             Arrays.asList(
                 currentPrices::handle,
-                priceHistory::handle));
+                priceHistory::handle,
+                hotInstrumentDetector::handle));
     }
 
     @Bean("instrumentConnectionManager")
