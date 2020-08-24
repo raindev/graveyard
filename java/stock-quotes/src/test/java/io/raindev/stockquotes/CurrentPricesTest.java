@@ -28,6 +28,32 @@ class CurrentPricesTest {
             currentPrices.list());
     }
 
+    // TODO extend test suite
+
+    @Test
+    void recordsInstrumentPrice() {
+    }
+
+    @Test
+    void retainsLatestPrice() {
+    }
+
+    @Test
+    void removesInstrumentPrice() {
+    }
+
+    @Test
+    void ignoresQuotesForMissingInstruments() {
+    }
+
+    @Test
+    void ignoresInstrumentRemovalsForMissingInstruments() {
+    }
+
+    @Test
+    void ignoresDuplicatedInstruments() {
+    }
+
     @Test
     void recordsPricesForMultipleInstruments() {
         currentPrices.handle(new InstrumentMessage(InstrumentMessage.Type.ADD,
