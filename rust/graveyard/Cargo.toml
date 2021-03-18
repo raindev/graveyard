@@ -5,3 +5,4 @@ authors = ["Andrew Barchuk <andrew@raindev.io>"]
 
 [dev-dependencies]
 quickcheck = "0.4.*"
+rand = "0.8.*"

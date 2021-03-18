@@ -69,3 +69,28 @@ mod tests {
         assert_eq!(10, min_unique_sum(&[0, 0, 1, 2, 3]));
     }
 }
+
+#[cfg(test)]
+mod benchmark {
+    extern crate test;
+    extern crate rand;
+
+    use super::*;
+    use self::test::Bencher;
+
+    #[bench]
+    fn with_800_of_1000(b: &mut Bencher) {
+        use self::rand::thread_rng;
+        use self::rand::seq::SliceRandom;
+
+        let mut rng = thread_rng();
+        let mut input: Vec<u32> = (0..1000).collect();
+        input.shuffle(&mut rng);
+        for i in 0..100 {
+            if input[i] < 100 {
+                input[i] += 1
+            }
+        }
+        b.iter(|| min_unique_sum(&input[0..800]));
+    }
+}
