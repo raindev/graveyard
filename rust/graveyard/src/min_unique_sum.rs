@@ -11,14 +11,21 @@ pub fn min_unique_sum(numbers: &[u32]) -> u32 {
         *counts.entry(number).or_insert(0) += 1;
     }
 
+    fn sum_between(n: u32, m: u32) -> u32 {
+        if m < n {
+            0
+        } else {
+            (m - n + 1) * (m + n) / 2
+        }
+    }
+
     let (first_number, first_count) = counts.iter().next()
         .expect("early return for empty input");
     let mut overflow = first_count - 1;
     let mut prev_number = **first_number;
     let mut sum = prev_number;
     for (number, count) in counts.iter().skip(1) {
-        sum += (prev_number + 1..=min(prev_number + overflow, *number - 1))
-            .sum::<u32>();
+        sum += sum_between(prev_number + 1, min(prev_number + overflow, *number - 1));
         sum += *number;
         overflow = overflow.checked_sub(*number - prev_number - 1).unwrap_or(0)
             + count - 1;
