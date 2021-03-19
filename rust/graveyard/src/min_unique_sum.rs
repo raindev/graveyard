@@ -1,25 +1,31 @@
 pub fn min_unique_sum(numbers: &[u32]) -> u32 {
-    use std::cmp::max;
+    use std::collections::BTreeMap;
+    use std::cmp::min;
 
-    let input_range = 0..1000;
-    assert!(numbers.len() <= input_range.len());
-
-    let mut counts = [0; 1000];
-    for n in numbers {
-        assert!(input_range.contains(n));
-        counts[*n as usize] += 1;
+    if numbers.is_empty() {
+        return 0;
     }
-    let mut sum = 0;
-    let mut overflow = 0;
-    for (n, count) in counts.iter().enumerate() {
-        if *count != 0 || overflow != 0 {
-            sum += n as u32;
-        }
-        if *count > 1 {
-            overflow += count - 1;
-        } else if *count == 0 {
-            overflow = max(0, overflow - 1);
-        }
+
+    let mut counts = BTreeMap::new();
+    for number in numbers {
+        *counts.entry(number).or_insert(0) += 1;
+    }
+
+    let (first_number, first_count) = counts.iter().next()
+        .expect("early return for empty input");
+    let mut overflow = first_count - 1;
+    let mut prev_number = **first_number;
+    let mut sum = prev_number;
+    for (number, count) in counts.iter().skip(1) {
+        sum += (prev_number + 1..=min(prev_number + overflow, *number - 1))
+            .sum::<u32>();
+        sum += *number;
+        overflow = overflow.checked_sub(*number - prev_number - 1).unwrap_or(0)
+            + count - 1;
+        prev_number = **number;
+    }
+    if overflow != 0 {
+        sum += (prev_number + 1..=(prev_number + overflow)).sum::<u32>();
     }
 
     sum
@@ -32,6 +38,11 @@ mod tests {
     #[test]
     fn sample() {
         assert_eq!(17, min_unique_sum(&[3, 2, 1, 2, 7]));
+    }
+
+    #[test]
+    fn empty() {
+        assert_eq!(0, min_unique_sum(&[]));
     }
 
     #[test]
