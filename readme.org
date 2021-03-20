@@ -1,0 +1,6 @@
+* Graveyard
+
+A place for the throw away code to settle down. Not documented, not idiomatic,
+not performant, not tested, not generalised, not robust, you've got it. Not
+intended for reuse. Here be dragons. The main goal is learning, the code
+produced is a side effect.
