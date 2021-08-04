@@ -8,6 +8,8 @@ build/
 # Gradle Wrapper
 gradle/
 gradlew*
+# IDEA
+.idea/
 
 # Haskell
 .cabal-sandbox/
