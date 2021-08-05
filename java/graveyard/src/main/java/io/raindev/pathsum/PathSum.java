@@ -20,7 +20,8 @@ class PathSum {
         }
         final var leftPaths = paths(targetSum - root.val, root.left);
         final var rightPaths = paths(targetSum - root.val, root.right);
-        final var result = new ArrayList<>(leftPaths);
+        final var result = new ArrayList<List<Integer>>(leftPaths.size() + rightPaths.size());
+        result.addAll(leftPaths);
         result.addAll(rightPaths);
         for (var path : result) {
             path.add(0, root.val);
