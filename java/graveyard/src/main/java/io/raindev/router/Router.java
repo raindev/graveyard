@@ -112,25 +112,13 @@ class Router {
                 return Optional.empty();
             }
         }
-        Optional<PathNode> matchingChild = node.children.stream()
+        return node.children.stream()
             .filter(c -> componentMatches(c.component, path.get(0)))
-            .findFirst();
-        if (matchingChild.isEmpty()) {
-            return Optional.empty();
-        } else {
-            Optional<String> childPath = match(
-                    matchingChild.get(),
-                    path.subList(1, path.size()));
-            if (childPath.isEmpty()) {
-                return Optional.empty();
-            } else {
-                return Optional.of((
-                    node.component.isEmpty()
+            .findFirst()
+            .flatMap(c -> match(c, path.subList(1, path.size())))
+            .map(childPath -> (node.component.isEmpty()
                         ? ""
-                        : "/" + node.component)
-                    + childPath.get());
-            }
-        }
+                        : "/" + node.component) + childPath);
     }
 
     boolean componentMatches(String pattern, String component) {
