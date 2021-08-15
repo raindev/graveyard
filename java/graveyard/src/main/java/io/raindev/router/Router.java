@@ -101,27 +101,36 @@ class Router {
     }
 
     Optional<String> match(String path) {
-        final var components = components(path);
-        var currNode = root;
-        var result = new StringBuilder();
-        while (!components.isEmpty() && !currNode.children.isEmpty()) {
-            var currComponent = components.remove(0);
-            var childMatch = false;
-            for (var child : currNode.children) {
-                if (componentMatches(child.component, currComponent)) {
-                    childMatch = true;
-                    currNode = child;
-                    result.append("/" + child.component);
-                }
-            }
-            if (!childMatch) {
+        return match(root, components(path));
+    }
+
+    Optional<String> match(PathNode node, List<String> path) {
+        if (path.isEmpty()) {
+            if (node.isLeaf) {
+                return Optional.of("/" + node.component);
+            } else {
                 return Optional.empty();
             }
         }
-        if (!components.isEmpty() || !currNode.isLeaf) {
+        Optional<PathNode> matchingChild = node.children.stream()
+            .filter(c -> componentMatches(c.component, path.get(0)))
+            .findFirst();
+        if (matchingChild.isEmpty()) {
             return Optional.empty();
+        } else {
+            Optional<String> childPath = match(
+                    matchingChild.get(),
+                    path.subList(1, path.size()));
+            if (childPath.isEmpty()) {
+                return Optional.empty();
+            } else {
+                return Optional.of((
+                    node.component.isEmpty()
+                        ? ""
+                        : "/" + node.component)
+                    + childPath.get());
+            }
         }
-        return Optional.of(result.length() == 0 ? "/" : result.toString());
     }
 
     boolean componentMatches(String pattern, String component) {
