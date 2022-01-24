@@ -1,6 +1,6 @@
 pub fn min_unique_sum(numbers: &[u32]) -> u32 {
-    use std::collections::BTreeMap;
     use std::cmp::min;
+    use std::collections::BTreeMap;
 
     if numbers.is_empty() {
         return 0;
@@ -19,16 +19,14 @@ pub fn min_unique_sum(numbers: &[u32]) -> u32 {
         }
     }
 
-    let (first_number, first_count) = counts.iter().next()
-        .expect("early return for empty input");
+    let (first_number, first_count) = counts.iter().next().expect("early return for empty input");
     let mut overflow = first_count - 1;
     let mut prev_number = **first_number;
     let mut sum = prev_number;
     for (number, count) in counts.iter().skip(1) {
         sum += sum_between(prev_number + 1, min(prev_number + overflow, *number - 1));
         sum += *number;
-        overflow = overflow.checked_sub(*number - prev_number - 1).unwrap_or(0)
-            + count - 1;
+        overflow = overflow.checked_sub(*number - prev_number - 1).unwrap_or(0) + count - 1;
         prev_number = **number;
     }
     if overflow != 0 {
@@ -90,16 +88,16 @@ mod tests {
 
 #[cfg(test)]
 mod benchmark {
-    extern crate test;
     extern crate rand;
+    extern crate test;
 
-    use super::*;
     use self::test::Bencher;
+    use super::*;
 
     #[bench]
     fn with_800_of_1000(b: &mut Bencher) {
-        use self::rand::thread_rng;
         use self::rand::seq::SliceRandom;
+        use self::rand::thread_rng;
 
         let mut rng = thread_rng();
         let mut input: Vec<u32> = (0..1000).collect();
