@@ -1,13 +1,29 @@
-pub fn median_sliding_window(nums: &[i32], k: i32) -> Vec<f64> {
-    // use a static storted buffer for the window, replace the passed number with the upcoming one
+pub fn median_sliding_window(nums: &[i32], k: usize) -> Vec<f64> {
+    if nums.len() < k {
+        return vec![];
+    }
+
+    // use a static sorted buffer for the window, replace the passed number with the upcoming one
     // and ensure the buffer is still sorted each move
-    nums.windows(k as usize).map(|ns| median(&ns)).collect()
+    let mut buff = nums[0..k].to_vec();
+    buff.sort_unstable();
+    let mut res = vec![];
+    for i in k..nums.len() {
+        res.push(median(&buff));
+        replace(&mut buff, nums[i - k], nums[i]);
+    }
+    res.push(median(&buff));
+    res
+}
+
+fn replace(buff: &mut Vec<i32>, old: i32, new: i32) {
+    let old_idx = buff.binary_search(&old).unwrap();
+    buff.remove(old_idx);
+    let new_idx = buff.binary_search(&new).unwrap_or_else(|x| x);
+    buff.insert(new_idx, new);
 }
 
 fn median(slice: &[i32]) -> f64 {
-    let mut sorted_slice = slice.to_vec();
-    sorted_slice.sort_unstable();
-    let slice = sorted_slice;
     let len = slice.len();
     match slice.len() % 2 {
         1 => slice[len / 2] as f64,
