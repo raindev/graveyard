@@ -1,4 +1,4 @@
-pub fn median_sliding_window(nums: Vec<i32>, k: i32) -> Vec<f64> {
+pub fn median_sliding_window(nums: &[i32], k: i32) -> Vec<f64> {
     // use a static storted buffer for the window, replace the passed number with the upcoming one
     // and ensure the buffer is still sorted each move
     nums.windows(k as usize)
@@ -28,12 +28,50 @@ mod tests {
     fn sample() {
         assert_eq!(
             vec![2.0f64, 3.0, 3.0, 3.0, 2.0, 3.0, 2.0],
-            median_sliding_window(vec![1, 2, 3, 4, 2, 3, 1, 4, 2], 3)
+            median_sliding_window(&vec![1, 2, 3, 4, 2, 3, 1, 4, 2], 3)
         )
     }
 
     #[test]
-    fn even() {
-        assert_eq!(vec![2.5], median_sliding_window(vec![1, 4, 2, 3], 4))
+    fn even_items() {
+        assert_eq!(vec![2.5], median_sliding_window(&vec![1, 4, 2, 3], 4))
+    }
+
+    #[test]
+    fn odd_items() {
+        assert_eq!(vec![3.0], median_sliding_window(&vec![1, 4, 6, 2, 3], 5))
+    }
+
+    #[test]
+    fn i32_overflow() {
+        assert_eq!(
+            vec![i32::MAX as f64],
+            median_sliding_window(&vec![i32::MAX, i32::MAX], 2)
+        )
+    }
+
+    #[test]
+    fn oversized_window() {
+        assert_eq!(Vec::<f64>::new(), median_sliding_window(&vec![2, 3], 3))
+    }
+}
+
+#[cfg(test)]
+mod benchmark {
+    extern crate rand;
+    extern crate test;
+
+    use self::test::Bencher;
+    use super::*;
+
+    #[bench]
+    fn with_100_and_10_00(b: &mut Bencher) {
+        use self::rand::seq::SliceRandom;
+        use self::rand::thread_rng;
+
+        let mut rng = thread_rng();
+        let mut input: Vec<i32> = (0..10_000).collect();
+        input.shuffle(&mut rng);
+        b.iter(|| median_sliding_window(&input, 100));
     }
 }
