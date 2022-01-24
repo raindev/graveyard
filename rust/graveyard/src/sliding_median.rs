@@ -4,7 +4,7 @@ pub fn median_sliding_window(nums: &[i32], k: i32) -> Vec<f64> {
     nums.windows(k as usize)
         .map(|ns| {
             let mut sorted_nums = ns.to_vec();
-            sorted_nums.sort();
+            sorted_nums.sort_unstable();
             sorted_nums
         })
         .map(|ns| median(&ns))
