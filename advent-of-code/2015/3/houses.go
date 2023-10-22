@@ -19,36 +19,32 @@ type point struct {
 }
 
 func AtLeastOnePresent(way []direction) int {
-	var santaX, santaY int
-	var roboSantaX, roboSantaY int
-	visited := map[point]bool{{santaX, santaY}: true}
+	var santa, roboSanta point
+	visited := map[point]bool{{0, 0}: true}
 	santasTurn := true
 	for _, d := range way {
 		if santasTurn {
-			santaX, santaY = move(santaX, santaY, d)
-			visited[point{santaX, santaY}] = true
+			visited[santa.move(d)] = true
 		} else {
-			roboSantaX, roboSantaY = move(roboSantaX, roboSantaY, d)
-			visited[point{roboSantaX, roboSantaY}] = true
+			visited[roboSanta.move(d)] = true
 		}
 		santasTurn = !santasTurn
 	}
 	return len(visited)
 }
 
-func move(x, y int, d direction) (int, int) {
+func (s *point) move(d direction) point {
 	switch d {
 	case west:
-		return x - 1, y
+		s.x--
 	case east:
-		return x + 1, y
-	case north:
-		return x, y + 1
+		s.x++
 	case south:
-		return x, y - 1
-	default:
-		panic("unknown direction")
+		s.y--
+	case north:
+		s.y++
 	}
+	return *s
 }
 
 func readInput() (res []direction) {
