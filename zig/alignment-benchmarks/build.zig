@@ -2,6 +2,8 @@ const std = @import("std");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
+    const opts = .{ .target = target, .optimize = .ReleaseFast };
+    const zbench_module = b.dependency("zbench", opts).module("zbench");
 
     const binaries = [_][]const u8{
         "aligned",
@@ -16,6 +18,7 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = .ReleaseFast,
         });
+        exe.root_module.addImport("zbench", zbench_module);
         b.installArtifact(exe);
     }
 }

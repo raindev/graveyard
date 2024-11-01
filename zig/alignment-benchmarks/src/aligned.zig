@@ -1,21 +1,34 @@
+const zbench = @import("zbench");
 const std = @import("std");
 const math = std.math;
 
-const AlignedStruct = struct {
+const AlignedStruct = packed struct {
     a: u16,
     b: u16,
     c: u8,
 };
 
+const count = 100_000_000;
+var items: []AlignedStruct = undefined;
+
 pub fn main() !void {
     std.debug.print("Size of AlignedStruct: {}\n", .{@sizeOf(AlignedStruct)});
     std.debug.print("Bit size of AlignedStruct: {}\n", .{@bitSizeOf(AlignedStruct)});
     std.debug.print("Alignment of AlignedStruct: {}\n", .{@alignOf(AlignedStruct)});
+
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
 
-    const count = 100_000_000;
-    var items: []AlignedStruct = try allocator.alloc(AlignedStruct, count);
+    items = allocator.alloc(AlignedStruct, count) catch unreachable;
+    defer allocator.free(items);
+
+    var bench = zbench.Benchmark.init(allocator, .{});
+    defer bench.deinit();
+    try bench.add("Aligned struct", run, .{});
+    try bench.run(std.io.getStdOut().writer());
+}
+
+fn run(_: std.mem.Allocator) void {
     for (0..count) |i| {
         items[i] = .{
             .a = @intCast(i % math.maxInt(u16)),
