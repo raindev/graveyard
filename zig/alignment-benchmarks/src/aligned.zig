@@ -8,9 +8,6 @@ const AlignedStruct = packed struct {
     c: u8,
 };
 
-const count = 100_000_000;
-var items: []AlignedStruct = undefined;
-
 pub fn main() !void {
     std.debug.print("Size of AlignedStruct: {}\n", .{@sizeOf(AlignedStruct)});
     std.debug.print("Bit size of AlignedStruct: {}\n", .{@bitSizeOf(AlignedStruct)});
@@ -18,17 +15,16 @@ pub fn main() !void {
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
-
-    items = allocator.alloc(AlignedStruct, count) catch unreachable;
-    defer allocator.free(items);
-
     var bench = zbench.Benchmark.init(allocator, .{});
     defer bench.deinit();
     try bench.add("Aligned struct", run, .{});
     try bench.run(std.io.getStdOut().writer());
 }
 
-fn run(_: std.mem.Allocator) void {
+fn run(allocator: std.mem.Allocator) void {
+    const count = 100_000_000;
+    var items: []AlignedStruct = allocator.alloc(AlignedStruct, count) catch unreachable;
+    defer allocator.free(items);
     for (0..count) |i| {
         items[i] = .{
             .a = @intCast(i % math.maxInt(u16)),
