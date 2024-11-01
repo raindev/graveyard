@@ -1,0 +1,22 @@
+$ hyperfine --warmup 1 zig-out/bin/*
+Benchmark 1: zig-out/bin/aligned
+  Time (mean ± σ):      92.8 ms ±   1.2 ms    [User: 62.2 ms, System: 27.7 ms]
+  Range (min … max):    90.8 ms …  96.8 ms    30 runs
+
+Benchmark 2: zig-out/bin/extern
+  Time (mean ± σ):      94.0 ms ±   0.8 ms    [User: 63.2 ms, System: 26.8 ms]
+  Range (min … max):    92.9 ms …  96.7 ms    30 runs
+
+Benchmark 3: zig-out/bin/extern-byte
+  Time (mean ± σ):      89.6 ms ±   0.6 ms    [User: 64.4 ms, System: 22.5 ms]
+  Range (min … max):    88.5 ms …  91.4 ms    32 runs
+
+Benchmark 4: zig-out/bin/packed
+  Time (mean ± σ):     111.4 ms ±   0.8 ms    [User: 71.1 ms, System: 38.5 ms]
+  Range (min … max):   109.7 ms … 113.9 ms    25 runs
+
+Summary
+  zig-out/bin/extern-byte ran
+    1.04 ± 0.02 times faster than zig-out/bin/aligned
+    1.05 ± 0.01 times faster than zig-out/bin/extern
+    1.24 ± 0.01 times faster than zig-out/bin/packed

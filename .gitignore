@@ -15,3 +15,7 @@ gradlew*
 .cabal-sandbox/
 dist/
 cabal.sandbox.config
+
+# Zig
+.zig-cache/
+zig-out/
