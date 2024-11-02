@@ -1,0 +1,44 @@
+$ sudo perf stat -r 10 -- taskset 7 zig-out/bin/aligned
+
+ Performance counter stats for 'taskset 7 zig-out/bin/aligned' (10 runs):
+
+            960.41 msec task-clock                       #    0.955 CPUs utilized               ( +-  8.73% )
+               194      context-switches                 #  201.998 /sec                        ( +- 24.23% )
+                 0      cpu-migrations                   #    0.000 /sec
+            146573      page-faults                      #  152.615 K/sec                       ( +-  0.00% )
+   <not supported>      cycles
+   <not supported>      instructions
+   <not supported>      branches
+   <not supported>      branch-misses
+
+            1.0058 +- 0.0890 seconds time elapsed  ( +-  8.84% )
+
+$ sudo perf stat -r 10 -- taskset 7 zig-out/bin/cache-aligned
+
+ Performance counter stats for 'taskset 7 zig-out/bin/cache-aligned' (10 runs):
+
+           1121.00 msec task-clock                       #    0.989 CPUs utilized               ( +-  5.43% )
+               146      context-switches                 #  130.241 /sec                        ( +- 13.89% )
+                 0      cpu-migrations                   #    0.000 /sec
+            195401      page-faults                      #  174.310 K/sec                       ( +-  0.00% )
+   <not supported>      cycles
+   <not supported>      instructions
+   <not supported>      branches
+   <not supported>      branch-misses
+
+            1.1331 +- 0.0625 seconds time elapsed  ( +-  5.52% )
+
+$ sudo perf stat -r 10 -- taskset 7 zig-out/bin/misaligned
+
+ Performance counter stats for 'taskset 7 zig-out/bin/misaligned' (10 runs):
+
+            831.77 msec task-clock                       #    0.983 CPUs utilized               ( +-  3.93% )
+               108      context-switches                 #  129.844 /sec                        ( +- 10.66% )
+                 0      cpu-migrations                   #    0.000 /sec
+            122159      page-faults                      #  146.867 K/sec                       ( +-  0.00% )
+   <not supported>      cycles
+   <not supported>      instructions
+   <not supported>      branches
+   <not supported>      branch-misses
+
+            0.8464 +- 0.0346 seconds time elapsed  ( +-  4.09% )
