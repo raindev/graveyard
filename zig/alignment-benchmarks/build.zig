@@ -5,9 +5,7 @@ pub fn build(b: *std.Build) void {
 
     const binaries = [_][]const u8{
         "aligned",
-        "packed",
-        "extern",
-        "extern-byte",
+        "misaligned",
     };
     inline for (binaries) |binary| {
         const exe = b.addExecutable(.{

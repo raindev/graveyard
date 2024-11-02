@@ -1,8 +1,8 @@
 const std = @import("std");
 
 const AbcStruct = extern struct {
-    a: u16,
-    b: u16,
+    a: u16 align(1),
+    b: u16 align(1),
     c: u8,
 };
 

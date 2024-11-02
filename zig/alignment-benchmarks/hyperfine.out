@@ -1,22 +1,126 @@
-$ hyperfine --warmup 1 zig-out/bin/*
+$ hyperfine --warmup=1 --show-output --ignore-failure zig-out/bin/*
 Benchmark 1: zig-out/bin/aligned
-  Time (mean ± σ):      92.8 ms ±   1.2 ms    [User: 62.2 ms, System: 27.7 ms]
-  Range (min … max):    90.8 ms …  96.8 ms    30 runs
+           4222ns allocator initialization
+          26928ns array allocation
+     1315067057ns array initialization
+      382508354ns array iteration
 
-Benchmark 2: zig-out/bin/extern
-  Time (mean ± σ):      94.0 ms ±   0.8 ms    [User: 63.2 ms, System: 26.8 ms]
-  Range (min … max):    92.9 ms …  96.7 ms    30 runs
+            980ns allocator initialization
+          89375ns array allocation
+      822859012ns array initialization
+      175661472ns array iteration
 
-Benchmark 3: zig-out/bin/extern-byte
-  Time (mean ± σ):      89.6 ms ±   0.6 ms    [User: 64.4 ms, System: 22.5 ms]
-  Range (min … max):    88.5 ms …  91.4 ms    32 runs
+            571ns allocator initialization
+          20378ns array allocation
+      674156986ns array initialization
+      184446828ns array iteration
 
-Benchmark 4: zig-out/bin/packed
-  Time (mean ± σ):     111.4 ms ±   0.8 ms    [User: 71.1 ms, System: 38.5 ms]
-  Range (min … max):   109.7 ms … 113.9 ms    25 runs
+            609ns allocator initialization
+          30115ns array allocation
+      841220103ns array initialization
+      298411637ns array iteration
+
+            658ns allocator initialization
+          22324ns array allocation
+      625592398ns array initialization
+      147221285ns array iteration
+
+            465ns allocator initialization
+          18954ns array allocation
+      628132562ns array initialization
+      137418171ns array iteration
+
+           1021ns allocator initialization
+          21776ns array allocation
+      581565053ns array initialization
+      183300797ns array iteration
+
+            936ns allocator initialization
+          28066ns array allocation
+      668050263ns array initialization
+      167780953ns array iteration
+
+            511ns allocator initialization
+          21717ns array allocation
+      679104616ns array initialization
+      177045589ns array iteration
+
+           1170ns allocator initialization
+          29388ns array allocation
+      640937555ns array initialization
+      160688188ns array iteration
+
+            948ns allocator initialization
+          20400ns array allocation
+      644540033ns array initialization
+      151925312ns array iteration
+
+  Time (mean ± σ):     929.4 ms ± 125.4 ms    [User: 411.1 ms, System: 503.4 ms]
+  Range (min … max):   826.1 ms … 1228.1 ms    10 runs
+
+  Warning: Ignoring non-zero exit code.
+
+Benchmark 2: zig-out/bin/misaligned
+           5249ns allocator initialization
+          37555ns array allocation
+      606271372ns array initialization
+      165593236ns array iteration
+
+            444ns allocator initialization
+          21102ns array allocation
+      596158695ns array initialization
+      276196363ns array iteration
+
+            577ns allocator initialization
+          24414ns array allocation
+      620992561ns array initialization
+      245217902ns array iteration
+
+            452ns allocator initialization
+          23998ns array allocation
+      718985918ns array initialization
+      228012406ns array iteration
+
+            675ns allocator initialization
+          26203ns array allocation
+      630717610ns array initialization
+      127701498ns array iteration
+
+            753ns allocator initialization
+          25316ns array allocation
+      570481951ns array initialization
+      119661605ns array iteration
+
+            550ns allocator initialization
+          28455ns array allocation
+      537180778ns array initialization
+      129436431ns array iteration
+
+            392ns allocator initialization
+          21107ns array allocation
+      529119895ns array initialization
+      129448533ns array iteration
+
+            446ns allocator initialization
+          20185ns array allocation
+      671336538ns array initialization
+      144325715ns array iteration
+
+            725ns allocator initialization
+          73245ns array allocation
+      592384045ns array initialization
+      142138854ns array iteration
+
+            488ns allocator initialization
+          25226ns array allocation
+      623440559ns array initialization
+      138366535ns array iteration
+
+  Time (mean ± σ):     838.9 ms ±  97.5 ms    [User: 391.5 ms, System: 434.5 ms]
+  Range (min … max):   721.4 ms … 1012.7 ms    10 runs
+
+  Warning: Ignoring non-zero exit code.
 
 Summary
-  zig-out/bin/extern-byte ran
-    1.04 ± 0.02 times faster than zig-out/bin/aligned
-    1.05 ± 0.01 times faster than zig-out/bin/extern
-    1.24 ± 0.01 times faster than zig-out/bin/packed
+  zig-out/bin/misaligned ran
+    1.11 ± 0.20 times faster than zig-out/bin/aligned
