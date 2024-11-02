@@ -1,126 +1,182 @@
 $ hyperfine --warmup=1 --show-output --ignore-failure zig-out/bin/*
 Benchmark 1: zig-out/bin/aligned
-           4222ns allocator initialization
-          26928ns array allocation
-     1315067057ns array initialization
-      382508354ns array iteration
+           7010ns allocator initialization
+          70049ns array allocation
+     1298003474ns array initialization
+      260245126ns array iteration
 
-            980ns allocator initialization
-          89375ns array allocation
-      822859012ns array initialization
-      175661472ns array iteration
+            719ns allocator initialization
+          24687ns array allocation
+      863339414ns array initialization
+      359594200ns array iteration
 
-            571ns allocator initialization
-          20378ns array allocation
-      674156986ns array initialization
-      184446828ns array iteration
+            506ns allocator initialization
+          24476ns array allocation
+      776391151ns array initialization
+      320450893ns array iteration
 
-            609ns allocator initialization
-          30115ns array allocation
-      841220103ns array initialization
-      298411637ns array iteration
+            456ns allocator initialization
+          26621ns array allocation
+      694088552ns array initialization
+      266359580ns array iteration
 
-            658ns allocator initialization
-          22324ns array allocation
-      625592398ns array initialization
-      147221285ns array iteration
+           3283ns allocator initialization
+          20538ns array allocation
+      639619383ns array initialization
+      230542616ns array iteration
 
-            465ns allocator initialization
-          18954ns array allocation
-      628132562ns array initialization
-      137418171ns array iteration
+            875ns allocator initialization
+          22888ns array allocation
+      611233304ns array initialization
+      251481522ns array iteration
 
-           1021ns allocator initialization
-          21776ns array allocation
-      581565053ns array initialization
-      183300797ns array iteration
+            433ns allocator initialization
+          20379ns array allocation
+      684784216ns array initialization
+      201786165ns array iteration
 
-            936ns allocator initialization
-          28066ns array allocation
-      668050263ns array initialization
-      167780953ns array iteration
+            369ns allocator initialization
+          18283ns array allocation
+      544983223ns array initialization
+      192286276ns array iteration
 
-            511ns allocator initialization
-          21717ns array allocation
-      679104616ns array initialization
-      177045589ns array iteration
+            849ns allocator initialization
+          18405ns array allocation
+      562649429ns array initialization
+      184560510ns array iteration
 
-           1170ns allocator initialization
-          29388ns array allocation
-      640937555ns array initialization
-      160688188ns array iteration
+            481ns allocator initialization
+          19881ns array allocation
+      640786231ns array initialization
+      259401292ns array iteration
 
-            948ns allocator initialization
-          20400ns array allocation
-      644540033ns array initialization
-      151925312ns array iteration
+            436ns allocator initialization
+          19084ns array allocation
+      610926812ns array initialization
+      202815479ns array iteration
 
-  Time (mean ± σ):     929.4 ms ± 125.4 ms    [User: 411.1 ms, System: 503.4 ms]
-  Range (min … max):   826.1 ms … 1228.1 ms    10 runs
+  Time (mean ± σ):     968.7 ms ± 156.3 ms    [User: 458.2 ms, System: 492.7 ms]
+  Range (min … max):   792.4 ms … 1291.4 ms    10 runs
 
-  Warning: Ignoring non-zero exit code.
+Benchmark 2: zig-out/bin/cache-aligned
+          14676ns allocator initialization
+          35081ns array allocation
+     1002305887ns array initialization
+      251734262ns array iteration
 
-Benchmark 2: zig-out/bin/misaligned
-           5249ns allocator initialization
-          37555ns array allocation
-      606271372ns array initialization
-      165593236ns array iteration
+            664ns allocator initialization
+          25400ns array allocation
+      832752980ns array initialization
+      219561117ns array iteration
 
-            444ns allocator initialization
-          21102ns array allocation
-      596158695ns array initialization
-      276196363ns array iteration
+            595ns allocator initialization
+          19447ns array allocation
+      782731077ns array initialization
+      332623266ns array iteration
 
-            577ns allocator initialization
-          24414ns array allocation
-      620992561ns array initialization
-      245217902ns array iteration
+           1128ns allocator initialization
+          29603ns array allocation
+     1000843122ns array initialization
+      344951590ns array iteration
 
-            452ns allocator initialization
-          23998ns array allocation
-      718985918ns array initialization
-      228012406ns array iteration
+            529ns allocator initialization
+          29209ns array allocation
+     1095710935ns array initialization
+      362206826ns array iteration
 
-            675ns allocator initialization
-          26203ns array allocation
-      630717610ns array initialization
-      127701498ns array iteration
+           4039ns allocator initialization
+          50286ns array allocation
+      971261406ns array initialization
+      298733760ns array iteration
 
-            753ns allocator initialization
-          25316ns array allocation
-      570481951ns array initialization
-      119661605ns array iteration
+            477ns allocator initialization
+          41497ns array allocation
+      752596072ns array initialization
+      227578532ns array iteration
 
-            550ns allocator initialization
-          28455ns array allocation
-      537180778ns array initialization
-      129436431ns array iteration
+            390ns allocator initialization
+          18624ns array allocation
+      745648153ns array initialization
+      250525913ns array iteration
 
-            392ns allocator initialization
-          21107ns array allocation
-      529119895ns array initialization
-      129448533ns array iteration
+            369ns allocator initialization
+          21673ns array allocation
+      841419534ns array initialization
+      470385178ns array iteration
 
-            446ns allocator initialization
-          20185ns array allocation
-      671336538ns array initialization
-      144325715ns array iteration
+            616ns allocator initialization
+          25338ns array allocation
+     1040339925ns array initialization
+      509308694ns array iteration
 
-            725ns allocator initialization
-          73245ns array allocation
-      592384045ns array initialization
-      142138854ns array iteration
+            596ns allocator initialization
+          23218ns array allocation
+      815294763ns array initialization
+      282593285ns array iteration
 
-            488ns allocator initialization
-          25226ns array allocation
-      623440559ns array initialization
-      138366535ns array iteration
+  Time (mean ± σ):      1.309 s ±  0.205 s    [User: 0.583 s, System: 0.692 s]
+  Range (min … max):    1.044 s …  1.639 s    10 runs
 
-  Time (mean ± σ):     838.9 ms ±  97.5 ms    [User: 391.5 ms, System: 434.5 ms]
-  Range (min … max):   721.4 ms … 1012.7 ms    10 runs
+Benchmark 3: zig-out/bin/misaligned
+           7735ns allocator initialization
+          31935ns array allocation
+      712867278ns array initialization
+      314559674ns array iteration
 
-  Warning: Ignoring non-zero exit code.
+           3618ns allocator initialization
+          24258ns array allocation
+      569244593ns array initialization
+      261475405ns array iteration
+
+            549ns allocator initialization
+          24493ns array allocation
+      600363301ns array initialization
+      302245893ns array iteration
+
+            759ns allocator initialization
+          26572ns array allocation
+      550035984ns array initialization
+      204180142ns array iteration
+
+            688ns allocator initialization
+          26585ns array allocation
+      537700250ns array initialization
+      198507478ns array iteration
+
+            689ns allocator initialization
+          28238ns array allocation
+      582980344ns array initialization
+      199395473ns array iteration
+
+           1464ns allocator initialization
+          22654ns array allocation
+      559385658ns array initialization
+      192785829ns array iteration
+
+            775ns allocator initialization
+          26344ns array allocation
+      554554114ns array initialization
+      204436334ns array iteration
+
+            669ns allocator initialization
+          26768ns array allocation
+      662612458ns array initialization
+      279672236ns array iteration
+
+            403ns allocator initialization
+          23408ns array allocation
+      707846711ns array initialization
+      268936368ns array iteration
+
+           3973ns allocator initialization
+          25247ns array allocation
+      607499908ns array initialization
+      256677015ns array iteration
+
+  Time (mean ± σ):     885.3 ms ±  90.7 ms    [User: 444.0 ms, System: 422.9 ms]
+  Range (min … max):   790.4 ms … 1047.8 ms    10 runs
 
 Summary
   zig-out/bin/misaligned ran
-    1.11 ± 0.20 times faster than zig-out/bin/aligned
+    1.09 ± 0.21 times faster than zig-out/bin/aligned
+    1.48 ± 0.28 times faster than zig-out/bin/cache-aligned

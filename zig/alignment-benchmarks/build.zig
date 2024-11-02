@@ -5,6 +5,7 @@ pub fn build(b: *std.Build) void {
 
     const binaries = [_][]const u8{
         "aligned",
+        "cache-aligned",
         "misaligned",
     };
     inline for (binaries) |binary| {

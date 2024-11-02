@@ -20,14 +20,14 @@ pub fn main() !u8 {
     for (0..count) |i|
         items[i] = .{
             .a = @truncate(i),
-            .b = @truncate(i),
-            .c = @truncate(i),
+            .b = @truncate(i + 1),
+            .c = @truncate(i + 2),
         };
     const array_init_ns = timer.lap();
 
     var even_a: usize = 0;
     for (items) |*item| {
-        if (item.a % 2 == 0) even_a += 1;
+        if (item.a % 2 == 0 and item.b % 2 == 0 and item.c % 2 == 0) even_a += 1;
     }
     const array_iter_ns = timer.lap();
 

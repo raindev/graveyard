@@ -1,9 +1,9 @@
 const std = @import("std");
 
 const AbcStruct = extern struct {
-    a: u16 align(1),
-    b: u16 align(1),
-    c: u8,
+    a: u16,
+    b: u16,
+    c: u32,
 };
 
 pub fn main() !u8 {
