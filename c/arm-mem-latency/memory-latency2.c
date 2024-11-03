@@ -6,8 +6,10 @@
 #include <sys/time.h>
 
 typedef struct __attribute__((packed)) node {
-    char buffer[24];
+    char pad;
     struct node *next;
+    char pad2;
+    char buffer[24];
 } node_t;
 
 #define NODES                     1000000
