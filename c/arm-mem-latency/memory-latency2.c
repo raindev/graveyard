@@ -6,10 +6,8 @@
 #include <sys/time.h>
 
 typedef struct __attribute__((packed)) node {
-    char pad;
-    struct node *next;
-    char pad2;
     char buffer[24];
+    struct node *next;
 } node_t;
 
 #define NODES                     1000000
@@ -22,11 +20,12 @@ static size_t counter_ = 0;
 
 static void init_alloc() {
     if (start_ == NULL) {
-        int rc = posix_memalign(&start_, 64, SIMPLE_ALLOCATOR_SIZE);
-        if (rc != 0) {
+        start_ = malloc(SIMPLE_ALLOCATOR_SIZE);
+        if (start_ == NULL) {
             printf("Error allocating %ld bytes for allocator!", SIMPLE_ALLOCATOR_SIZE);
             exit(1);
         }
+        __builtin_prefetch(start_ + 16 * 64);
         memset(start_, 0, SIMPLE_ALLOCATOR_SIZE);
         cur_ = start_;
         end_ = start_ + SIMPLE_ALLOCATOR_SIZE;
@@ -38,6 +37,7 @@ static void* simple_alloc(size_t size) {
       void *ptr = cur_;
       cur_ += size;
       counter_++;
+      __builtin_prefetch(cur_ + 16 * 64);
       return ptr;
     } else {
        printf("Error allocating %ld bytes!", size);
