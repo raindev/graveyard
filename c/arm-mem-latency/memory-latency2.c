@@ -28,7 +28,6 @@ static void init_alloc() {
         memset(start_, 0, SIMPLE_ALLOCATOR_SIZE);
         cur_ = start_;
         end_ = start_ + SIMPLE_ALLOCATOR_SIZE;
-        printf("start_: %p, end_: %p\n", start_, end_);
     }
 }
 

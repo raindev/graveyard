@@ -21,3 +21,16 @@
      1.13%  memory-latency1  libc.so.6          [.] 0x00000000000956b4
      1.11%  memory-latency1  libc.so.6          [.] 0x0000000000094dd4
      1.00%  memory-latency1  [kernel.kallsyms]  [k] _raw_spin_unlock
+
+Performance counter stats for './memory-latency1' (10 runs):
+
+            202.05 msec task-clock                       #    0.987 CPUs utilized               ( +-  0.34% )
+                16      context-switches                 #   79.189 /sec                        ( +-  7.17% )
+                 0      cpu-migrations                   #    0.000 /sec
+             11768      page-faults                      #   58.243 K/sec                       ( +-  0.00% )
+         359584509      cycles                           #    1.780 GHz                         ( +-  0.42% )
+         522062380      instructions                     #    1.45  insn per cycle              ( +-  0.12% )
+   <not supported>      branches
+            201459      branch-misses                                                           ( +-  1.33% )
+
+          0.204754 +- 0.000811 seconds time elapsed  ( +-  0.40% )
