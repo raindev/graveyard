@@ -7,7 +7,7 @@
 
 typedef struct node {
     struct node *next;
-    char buffer[20];
+    char buffer[24];
 } node_t;
 
 #define NODES                     1000000
