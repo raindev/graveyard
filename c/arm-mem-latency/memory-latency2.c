@@ -20,8 +20,8 @@ static size_t counter_ = 0;
 
 static void init_alloc() {
     if (start_ == NULL) {
-        start_ = malloc(SIMPLE_ALLOCATOR_SIZE);
-        if (start_ == NULL) {
+        int rc = posix_memalign(&start_, 64, SIMPLE_ALLOCATOR_SIZE);
+        if (rc != 0) {
             printf("Error allocating %ld bytes for allocator!", SIMPLE_ALLOCATOR_SIZE);
             exit(1);
         }

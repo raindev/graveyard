@@ -1,28 +1,27 @@
-# Overhead  Command          Shared Object          Symbol
-# ........  ...............  .....................  ...................................
+# Overhead  Command          Shared Object      Symbol
+# ........  ...............  .................  ...................................
 #
-    27.86%  memory-latency2  memory-latency2        [.] main
-    20.19%  memory-latency2  [kernel.kallsyms]      [k] __pi_clear_page
-     6.36%  memory-latency2  [kernel.kallsyms]      [k] el0_da
-     6.06%  memory-latency2  [kernel.kallsyms]      [k] mem_cgroup_commit_charge
-     4.92%  memory-latency2  [kernel.kallsyms]      [k] _raw_spin_unlock_irqrestore
-     4.85%  memory-latency2  [kernel.kallsyms]      [k] percpu_counter_add_batch
-     4.69%  memory-latency2  [kernel.kallsyms]      [k] arch_local_irq_restore
-     2.97%  memory-latency2  [kernel.kallsyms]      [k] arch_local_irq_restore
-     2.39%  memory-latency2  [kernel.kallsyms]      [k] post_alloc_hook
-     2.32%  memory-latency2  [kernel.kallsyms]      [k] _raw_spin_unlock
-     1.74%  memory-latency2  [kernel.kallsyms]      [k] get_mem_cgroup_from_mm
-     1.16%  memory-latency2  [kernel.kallsyms]      [k] get_page_from_freelist
-
+    19.31%  memory-latency2  [kernel.kallsyms]  [k] __pi_clear_page
+    12.47%  memory-latency2  memory-latency2    [.] main
+    12.30%  memory-latency2  libc.so.6          [.] 0x00000000000a2fc0
+     8.22%  memory-latency2  [kernel.kallsyms]  [k] el0_da
+     7.39%  memory-latency2  [kernel.kallsyms]  [k] arch_local_irq_restore
+     5.68%  memory-latency2  [kernel.kallsyms]  [k] percpu_counter_add_batch
+     5.00%  memory-latency2  [kernel.kallsyms]  [k] mem_cgroup_commit_charge
+     4.87%  memory-latency2  [kernel.kallsyms]  [k] _raw_spin_unlock_irqrestore
+     4.41%  memory-latency2  [kernel.kallsyms]  [k] arch_local_irq_restore
+     3.14%  memory-latency2  [kernel.kallsyms]  [k] post_alloc_hook
+     1.25%  memory-latency2  [kernel.kallsyms]  [k] _raw_spin_unlock
+ 
 Performance counter stats for './memory-latency2' (10 runs):
 
-             86.08 msec task-clock                       #    0.975 CPUs utilized               ( +-  0.52% )
-                 9      context-switches                 #  104.555 /sec                        ( +-  2.37% )
+            238.88 msec task-clock                       #    0.990 CPUs utilized               ( +-  0.13% )
+                21      context-switches                 #   87.910 /sec                        ( +-  3.84% )
                  0      cpu-migrations                   #    0.000 /sec
-              7862      page-faults                      #   91.335 K/sec                       ( +-  0.00% )
-         151607831      cycles                           #    1.761 GHz                         ( +-  0.17% )
-         126411887      instructions                     #    0.83  insn per cycle              ( +-  0.07% )
+             24464      page-faults                      #  102.411 K/sec                       ( +-  0.00% )
+         426847490      cycles                           #    1.787 GHz                         ( +-  0.12% )
+         367701664      instructions                     #    0.86  insn per cycle              ( +-  0.06% )
    <not supported>      branches
-            112027      branch-misses                                                           ( +-  0.76% )
+            302203      branch-misses                                                           ( +-  1.29% )
 
-          0.088307 +- 0.000459 seconds time elapsed  ( +-  0.52% )
+          0.241219 +- 0.000324 seconds time elapsed  ( +-  0.13% )
