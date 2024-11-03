@@ -1,0 +1,15 @@
+# Overhead  Command          Shared Object          Symbol
+# ........  ...............  .....................  ...................................
+#
+    25.42%  memory-latency2  memory-latency2        [.] main
+    14.48%  memory-latency2  [kernel.kallsyms]      [k] __pi_clear_page
+     8.58%  memory-latency2  [kernel.kallsyms]      [k] el0_da
+     8.23%  memory-latency2  [kernel.kallsyms]      [k] _raw_spin_unlock_irqrestore
+     6.41%  memory-latency2  [kernel.kallsyms]      [k] arch_local_irq_restore
+     4.91%  memory-latency2  [kernel.kallsyms]      [k] arch_local_irq_restore
+     3.28%  memory-latency2  [kernel.kallsyms]      [k] mem_cgroup_commit_charge
+     2.95%  memory-latency2  [kernel.kallsyms]      [k] percpu_counter_add_batch
+     1.78%  memory-latency2  [kernel.kallsyms]      [k] handle_mm_fault
+     1.77%  memory-latency2  [kernel.kallsyms]      [k] _raw_spin_unlock
+     1.44%  memory-latency2  [kernel.kallsyms]      [k] post_alloc_hook
+     1.29%  memory-latency2  [kernel.kallsyms]      [k] mas_walk

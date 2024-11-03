@@ -1,0 +1,23 @@
+# Overhead  Command          Shared Object      Symbol
+# ........  ...............  .................  ...................................
+#
+     9.45%  memory-latency1  [kernel.kallsyms]  [k] __pi_clear_page
+     8.73%  memory-latency1  libc.so.6          [.] malloc
+     5.64%  memory-latency1  [kernel.kallsyms]  [k] el0_da
+     4.52%  memory-latency1  libc.so.6          [.] 0x0000000000095ab8
+     4.01%  memory-latency1  libc.so.6          [.] cfree
+     3.97%  memory-latency1  [kernel.kallsyms]  [k] _raw_spin_unlock_irqrestore
+     3.90%  memory-latency1  libc.so.6          [.] 0x0000000000094324
+     3.88%  memory-latency1  memory-latency1    [.] main
+     3.47%  memory-latency1  [kernel.kallsyms]  [k] mem_cgroup_commit_charge
+     3.27%  memory-latency1  [kernel.kallsyms]  [k] arch_local_irq_restore
+     3.12%  memory-latency1  [kernel.kallsyms]  [k] arch_local_irq_restore
+     3.03%  memory-latency1  [kernel.kallsyms]  [k] percpu_counter_add_batch
+     2.13%  memory-latency1  [kernel.kallsyms]  [k] post_alloc_hook
+     1.75%  memory-latency1  libc.so.6          [.] 0x00000000000942c0
+     1.39%  memory-latency1  libc.so.6          [.] 0x00000000000923a8
+     1.26%  memory-latency1  libc.so.6          [.] 0x00000000000942c8
+     1.25%  memory-latency1  libc.so.6          [.] 0x000000000009568c
+     1.13%  memory-latency1  libc.so.6          [.] 0x00000000000956b4
+     1.11%  memory-latency1  libc.so.6          [.] 0x0000000000094dd4
+     1.00%  memory-latency1  [kernel.kallsyms]  [k] _raw_spin_unlock
