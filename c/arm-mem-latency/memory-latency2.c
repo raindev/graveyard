@@ -5,9 +5,9 @@
 #include <stddef.h>
 #include <sys/time.h>
 
-typedef struct node {
-    struct node *next;
+typedef struct __attribute__((packed)) node {
     char buffer[24];
+    struct node *next;
 } node_t;
 
 #define NODES                     1000000
