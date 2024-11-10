@@ -6,7 +6,7 @@ import (
 )
 
 func TestFloorClimbing(t *testing.T) {
-	input, err := os.ReadFile("input")
+	input, err := os.ReadFile("../input")
 	if err != nil {
 		panic(err)
 	}
