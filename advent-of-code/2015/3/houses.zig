@@ -7,15 +7,13 @@ const mem = std.mem;
 const Position = struct { i32, i32 };
 const Map = hash_map.AutoHashMap(Position, bool);
 
-fn visited(allocator: mem.Allocator, reader: fs.File.Reader) !u32 {
-    var buf_reader = io.bufferedReader(reader);
-    var r = buf_reader.reader();
+fn visited(allocator: mem.Allocator, reader: io.AnyReader) !u32 {
     var map = Map.init(allocator);
     defer map.deinit();
 
     try map.put(.{ 0, 0 }, true);
     var santa = Position{ 0, 0 };
-    while (r.readByte()) |direction| {
+    while (reader.readByte()) |direction| {
         try move(direction, &santa, &map);
     } else |err| {
         switch (err) {
@@ -26,9 +24,7 @@ fn visited(allocator: mem.Allocator, reader: fs.File.Reader) !u32 {
     return map.count();
 }
 
-fn visited_together(allocator: mem.Allocator, reader: fs.File.Reader) !u32 {
-    var buf_reader = io.bufferedReader(reader);
-    var r = buf_reader.reader();
+fn visited_together(allocator: mem.Allocator, reader: io.AnyReader) !u32 {
     var map = Map.init(allocator);
     defer map.deinit();
 
@@ -36,7 +32,7 @@ fn visited_together(allocator: mem.Allocator, reader: fs.File.Reader) !u32 {
     var santa = Position{ 0, 0 };
     var robo_santa = Position{ 0, 0 };
     var santas_turn = true;
-    while (r.readByte()) |direction| {
+    while (reader.readByte()) |direction| {
         try move(direction, if (santas_turn) &santa else &robo_santa, &map);
         santas_turn = !santas_turn;
     } else |err| {
@@ -64,8 +60,11 @@ test "houses visited also with Robo-Santa" {
 
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
+
     const file = try fs.cwd().openFile("input", .{});
-    const reader = file.reader();
+    const file_reader = file.reader();
+    var buf_reader = io.bufferedReader(file_reader);
+    const reader = buf_reader.reader().any();
 
     const houses_visited = try visited(allocator, reader);
     try expectEqual(2572, houses_visited);
