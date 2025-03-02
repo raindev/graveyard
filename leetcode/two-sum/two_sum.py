@@ -4,6 +4,9 @@ class Solution:
 
         >>> Solution().twoSum([1, 5, 7, 4], 8)
         [2, 0]
+
+        >>> Solution().twoSum([2, 5, 7, 2], 4)
+        [0, 3]
         """
         indexes = {}
         for i, n in enumerate(nums):
@@ -15,7 +18,7 @@ class Solution:
             indexes[n] = i
         for i, n in enumerate(nums):
             right = target - n
-            if right in indexes and indexes[right] != i:
+            if right in indexes:
                 return [indexes[right], i]
         return []
 
