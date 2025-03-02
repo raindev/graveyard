@@ -9,10 +9,9 @@ func smallerNumbersThanCurrent(nums []int) []int {
 	// tally up counts in ascending order
 	total_count := 0
 	for i := range counts {
-		curr := counts[i]
-		counts[i] = total_count
-		total_count += curr
+		counts[i], total_count = total_count, total_count+counts[i]
 	}
+	// order resulting counts in accordance with the input
 	res := make([]int, len(nums))
 	for i, n := range nums {
 		res[i] = counts[n]
