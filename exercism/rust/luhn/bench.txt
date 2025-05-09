@@ -1,0 +1,24 @@
+original
+35 ns/iter (+/- 2)
+
+is_whitespace => != ' '
+-20%
+28 ns/iter (+/- 1)
+
+try_fold
+-14%
+23 ns/iter (+/- 1)
+
+inlined closure
+-9%
+23->20 ns/iter (+/- 0)
+
+dead ends
+
+bytes()
++10%
+31 ns/iter (+/- 0)
+
+digit mapping in try_fold
+
+20 -> 33 ns/iter (+/- 0)

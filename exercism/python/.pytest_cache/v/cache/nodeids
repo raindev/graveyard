@@ -1,0 +1,7 @@
+[
+  "guidos-gorgeous-lasagna/lasagna_test.py::LasagnaTest::test_EXPECTED_BAKE_TIME",
+  "guidos-gorgeous-lasagna/lasagna_test.py::LasagnaTest::test_bake_time_remaining",
+  "guidos-gorgeous-lasagna/lasagna_test.py::LasagnaTest::test_docstrings_were_written",
+  "guidos-gorgeous-lasagna/lasagna_test.py::LasagnaTest::test_elapsed_time_in_minutes",
+  "guidos-gorgeous-lasagna/lasagna_test.py::LasagnaTest::test_preparation_time_in_minutes"
+]

@@ -1,0 +1,16 @@
+goos: darwin
+goarch: arm64
+pkg: piglatin
+cpu: Apple M3
+BenchmarkSentence-8   	  150668	      7761 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  155617	      7718 ns/op	   95184 B/op	      71 allocs/op
+BenchmarkSentence-8   	  155108	      7708 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  152515	      7737 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  150919	      7808 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  152236	      7860 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  153514	      7737 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  157036	      7705 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  157503	      7812 ns/op	   95185 B/op	      71 allocs/op
+BenchmarkSentence-8   	  151856	      7903 ns/op	   95185 B/op	      71 allocs/op
+PASS
+ok  	piglatin	13.916s

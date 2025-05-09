@@ -1,0 +1,7 @@
+[
+  "lasagna_test.py::LasagnaTest::test_EXPECTED_BAKE_TIME",
+  "lasagna_test.py::LasagnaTest::test_bake_time_remaining",
+  "lasagna_test.py::LasagnaTest::test_docstrings_were_written",
+  "lasagna_test.py::LasagnaTest::test_elapsed_time_in_minutes",
+  "lasagna_test.py::LasagnaTest::test_preparation_time_in_minutes"
+]

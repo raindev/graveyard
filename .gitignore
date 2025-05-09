@@ -1,21 +1,4 @@
-# Rust
-target
-Cargo.lock
-
-# Java
 build/
 .gradle/
-# Gradle Wrapper
-gradle/
-gradlew*
-# IDEA
-.idea/
-
-# Haskell
-.cabal-sandbox/
-dist/
-cabal.sandbox.config
-
-# Zig
-.zig-cache/
-zig-out/
+gradlew
+*.out
