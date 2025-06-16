@@ -1,17 +1,32 @@
 #include <stdio.h>
+#include <assert.h>
 
-#define MAXLINE 1000
+#define MAXLINE 5
+#define THRESHOLD 2
 
 int _getline(char line[], int limit);
 
 main()
 {
-	char line[MAXLINE];
-	int len;
+	// otherwise len has to be accumulated across line chunks
+	assert(MAXLINE > THRESHOLD);
 
-	while ((len = _getline(line, MAXLINE)) != 0)
-		if (len > 80)
+	char line[MAXLINE];
+	int len, is_eol, continues;
+
+	continues = 0;
+	while ((len = _getline(line, MAXLINE)) != 0) {
+		assert(len < MAXLINE); // len excludes \0
+
+		//printf("chunk: '%s'\n", line);
+		is_eol = line[len - 1] == '\n';
+		if (continues || !is_eol || len > THRESHOLD)
 			printf("%s", line);
+		if (is_eol)
+			continues = 0;
+		else
+			continues = 1;
+	}
 }
 
 int _getline(char line[], int limit)
@@ -24,5 +39,6 @@ int _getline(char line[], int limit)
 	if (c == '\n')
 		line[i++] = '\n';
 	line[i] = '\0';
+	assert(i < limit);
 	return i;
 }
