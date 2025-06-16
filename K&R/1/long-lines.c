@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#define MAXLINE 5
-#define THRESHOLD 2
+#define MAXLINE 1000
+#define THRESHOLD 80
 
 int _getline(char line[], int limit);
 
@@ -20,12 +20,11 @@ main()
 
 		//printf("chunk: '%s'\n", line);
 		is_eol = line[len - 1] == '\n';
-		if (continues || !is_eol || len > THRESHOLD)
+		continues = continues || !is_eol;
+		if (continues || len > THRESHOLD)
 			printf("%s", line);
 		if (is_eol)
 			continues = 0;
-		else
-			continues = 1;
 	}
 }
 
