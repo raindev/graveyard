@@ -7,12 +7,11 @@ main()
 	int c, col;
 
 	col = 0;
-	while ((c = getchar()) != EOF) {
+	while ((c = getchar()) != EOF)
 		if (c == '\t') {
-			do {
+			putchar(' ');
+			while (++col % TS != 0)
 				putchar(' ');
-				++col;
-			} while(col % TS != 0);
 		} else {
 			putchar(c);
 			if (c == '\n')
@@ -20,5 +19,4 @@ main()
 			else
 				++col;
 		}
-	}
 }
