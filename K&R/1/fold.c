@@ -2,46 +2,62 @@
 #include <stdio.h>
 
 #define COLUMNS 4
+#define TS 4
 
-int spaces(int ws, int col, int limit);
+int spaces(char ws[], int cws, int col, int limit);
 
-// todo deal with tabs
 main()
 {
-	int c, col, ws;
+	assert(TS <= COLUMNS);
 
-	ws = 0;
+	int c, col, cws;
+	char ws[COLUMNS];
+
+	cws = 0;
 	col = 0;
 	while ((c = getchar()) != EOF) {
 		assert(col >= 0 && col <= COLUMNS);
-		assert(ws >= 0);
-		if (c == ' ') {
-			++ws;
-		} else {
-			col = spaces(ws, col, COLUMNS);
-			ws = 0;
+		assert(cws >= 0);
+		if (c == ' ' || c == '\t') {
+			ws[cws++] = c;
+		}
+		if (c != ' ' && c != '\t' || col == COLUMNS || cws == COLUMNS) {
+			col = spaces(ws, cws, col, COLUMNS);
+			cws = 0;
 			if (c == '\n' || col == COLUMNS) {
 				putchar('\n');
 				col = 0;
-			} else if (c != '\n') {
+			}
+			if (c != '\n' && c != ' ' && c != '\t') {
 				putchar(c);
 				col = col + 1;
 			}
 		}
 	}
-	spaces(ws, col, COLUMNS);
+	spaces(ws, cws, col, COLUMNS);
 }
 
-int spaces(int ws, int col, int limit)
+int spaces(char ws[], int cws, int col, int limit)
 {
-	while (ws > 0) {
+	int i;
+
+	for (i = 0; i < cws; ++i) {
 		if (col == limit) {
 			putchar('\n');
 			col = 0;
 		}
-		putchar(' ');
-		--ws;
-		++col;
+		if (ws[i] == ' ') {
+			putchar(' ');
+			++col;
+		} else {
+			assert(ws[i] == '\t');
+			if (limit - col < TS) {
+				putchar('\n');
+				col = 0;
+			}
+			putchar('\t');
+			col = col + TS;
+		}
 	}
 	return col;
 }
