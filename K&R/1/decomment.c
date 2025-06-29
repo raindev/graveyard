@@ -26,6 +26,7 @@
 		 - to avoid placing an arbitrary upper limit on the amount of whitespace before the next non-whitespace, while still trimming trailing whitespace, it's easiest to skip the whitespace until the next significant character in all cases, avoiding dynamic memory allocation
 */
 
+#include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 
@@ -35,10 +36,11 @@
 main()
 {
 	int string_state, comment_state, space_state;
-	int c, prev, prev_slash;
+	int c, prev, pending_slash, pending_space;
 
 	string_state = comment_state = space_state = OUT;
-	prev_slash = 0;
+	pending_slash = 0;
+	pending_space = 0;
 	prev = -1;
 	while ((c = getchar()) != EOF) {
 		if (string_state == IN) {
@@ -52,22 +54,33 @@ main()
 			} else {
 				if (prev == '/' && c == '*') {
 					comment_state = IN;
-					prev_slash = 0;
+					pending_slash = 0;
+					if (space_state == OUT)
+						pending_space = 1;
 				} else {
-					// hold on slash until it's known it's not start of comment
+					// hold on slash until it's known it's not a start of comment
 					if (c != '/') {
-						if (prev_slash)
+						if (pending_space && !isspace(c))
+							putchar(' ');
+						if (pending_slash)
 							putchar('/');
 						putchar(c);
-						prev_slash = 0;
-					} else
-						prev_slash = 1;
+						pending_slash = 0;
+						pending_space = 0;
+					} else {
+						if (pending_slash)
+							putchar('/');
+						pending_slash = 1;
+					}
 					if (c == '"' && prev != '\\' && prev != '\'')
 						string_state = IN;
-					else if (isspace(c))
-						space_state = IN; // fixme use to insert additional whitespace if needed
-					else
-						space_state = OUT;
+					else if (isspace(c)) {
+						space_state = IN;
+						pending_space = 0;
+					} else {
+						if (!pending_slash)
+							space_state = OUT;
+					}
 				}
 			}
 		}
