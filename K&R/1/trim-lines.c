@@ -11,6 +11,7 @@ main()
 	char line[MAXLINE];
 	int len, trim_pos, i;
 
+	// FIXME if line is longer than MAXLINE, space inside of it might be trimmed
 	while ((len = _getline(line, MAXLINE)) != 0) {
 		trim_pos = rtrim(line, len);
 		if (trim_pos >= 0) {
