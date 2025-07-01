@@ -41,6 +41,11 @@ main()
 	unsigned long max_ulong = ~0;
 	assert(max_ulong == ULONG_MAX);
 
+	float max_float = 1.0;
+	while (max_float * 2 > max_float && max_float * 2 - max_float == max_float)
+		max_float = max_float * 2;
+	printf("max_float: %f\n", max_float);
+
 	printf("float: %f - %f\n", FLT_MIN, FLT_MAX);
 	printf("double: %f - %f\n", DBL_MIN, DBL_MAX);
 	printf("long double: %Lf - %Lf\n", LDBL_MIN, LDBL_MAX);
