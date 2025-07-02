@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <float.h>
 #include <stdio.h>
+#include <math.h>
 #include <limits.h>
 
 main()
@@ -41,12 +42,14 @@ main()
 	unsigned long max_ulong = ~0;
 	assert(max_ulong == ULONG_MAX);
 
+	// this will only give the order of magnitude
+	// the actual value is almost twice of the computed
 	float max_float = 1.0;
-	while (max_float * 2 > max_float && max_float * 2 - max_float == max_float)
+	while (max_float * 2 > max_float && !isinf(max_float * 2))
 		max_float = max_float * 2;
-	printf("max_float: %f\n", max_float);
+	printf("max_float: %e\n", max_float);
 
-	printf("float: %f - %f\n", FLT_MIN, FLT_MAX);
-	printf("double: %f - %f\n", DBL_MIN, DBL_MAX);
-	printf("long double: %Lf - %Lf\n", LDBL_MIN, LDBL_MAX);
+	printf("float: %e - %e\n", FLT_MIN, FLT_MAX);
+	printf("double: %e - %e\n", DBL_MIN, DBL_MAX);
+	printf("long double: %Le - %Le\n", LDBL_MIN, LDBL_MAX);
 }
