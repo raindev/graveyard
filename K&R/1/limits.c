@@ -28,19 +28,9 @@ main()
 	printf("signed long: %ld - %ld\n", LONG_MIN, LONG_MAX);
 	printf("unsigned long: %d - %lu\n", 0, ULONG_MAX);
 
-	long max_long = 1;
-	while (max_long * 2 > 0)
-		max_long = max_long * 2;
-	max_long = max_long * 2 - 1;
-	assert(max_long == LONG_MAX);
-
-	long min_long = ~0;
-	while(min_long << 1 < 0)
-		min_long = min_long << 1;
-	assert(min_long == LONG_MIN);
-
-	unsigned long max_ulong = ~0;
-	assert(max_ulong == ULONG_MAX);
+	assert(~0UL >> 1 == LONG_MAX);
+	assert(~(~0UL >> 1) == LONG_MIN);
+	assert(~0 == ULONG_MAX);
 
 	// this will only give the order of magnitude
 	// the actual value is almost twice of the computed
