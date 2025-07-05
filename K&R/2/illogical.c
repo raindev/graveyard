@@ -12,7 +12,7 @@ main()
 	// assignment has to be extracted from the logical expression as otherwise
 	// modification and access to c are not ordered (-Wunsequenced)
 	c = getchar();
-	for (i = 0; (i < lim - 1) + (c != '\n') + (c != EOF) == 3; ++i) {
+	for (i = 0; (i < lim - 1) * (c != '\n') * (c != EOF) != 0; ++i) {
 		s[i] = c;
 		c = getchar();
 	}
