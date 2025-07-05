@@ -9,8 +9,13 @@ main()
 	int lim = LIMIT;
 	char s[LIMIT];
 	int c, i;
-	for (i = 0; ((i < lim - 1) + ((c = getchar()) != '\n')) + (c != EOF) == 3; ++i)
+	// assignment has to be extracted from the logical expression as otherwise
+	// modification and access to c are not ordered (-Wunsequenced)
+	c = getchar();
+	for (i = 0; (i < lim - 1) + (c != '\n') + (c != EOF) == 3; ++i) {
 		s[i] = c;
+		c = getchar();
+	}
 	int len = strlen(s);
 	assert(len <= LIMIT);
 	assert(s[len - 1] != 0);
