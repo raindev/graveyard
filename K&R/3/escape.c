@@ -21,6 +21,9 @@ void escape(char s[], char t[]) {
 	int si, ti;
 	for (ti = si = 0; s[si] != '\0'; ++si)
 		switch (s[si]) {
+			default:
+				t[ti++] = s[si];
+				break;
 			case '\t':
 				t[ti++] = '\\';
 				t[ti++] = 't';
@@ -28,9 +31,6 @@ void escape(char s[], char t[]) {
 			case '\n':
 				t[ti++] = '\\';
 				t[ti++] = 'n';
-				break;
-			default:
-				t[ti++] = s[si];
 				break;
 		}
 	t[ti] = '\0';
