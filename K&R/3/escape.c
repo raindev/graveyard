@@ -6,8 +6,8 @@ void assert_eq(char s1[], char s2[]);
 
 main()
 {
-	char unescaped[] = "\tthen\n";
-	char escaped[] = "\\tthen\\n";
+	char unescaped[] = "\tt\\hen\n";
+	char escaped[] = "\\tt\\hen\\n";
 	char s[128];
 
 	escape(unescaped, s);
@@ -40,25 +40,25 @@ void unescape(char s[], char t[]) {
 	int escaped = 0, si, ti;
 
 	for (si = ti = 0; s[si] != '\0'; ++si)
-		switch (s[si]) {
-			case '\\':
+		if (!escaped)
+			if (s[si] == '\\')
 				escaped = 1;
-				break;
-			case 'n':
-			case 't':
-				if (escaped) {
-					if (s[si] == 't')
-						t[ti++] = '\t';
-					else
-						t[ti++] = '\n';
-				} else
-					t[ti++] = s[si];
-				escaped = 0;
-				break;
-			default:
+			else
 				t[ti++] = s[si];
-				escaped = 0;
-				break;
+		else {
+			escaped = 0;
+			switch (s[si]) {
+				case 'n':
+					t[ti++] = '\n';
+					break;
+				case 't':
+					t[ti++] = '\t';
+					break;
+				default:
+					t[ti++] = '\\';
+					t[ti++] = s[si];
+					break;
+			}
 		}
 	t[ti++] = '\0';
 }
