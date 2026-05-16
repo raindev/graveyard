@@ -10,15 +10,19 @@ func main() {
 	respond := make(chan interface{})
 	server(respond)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx, cancel_req := context.WithCancel(context.Background())
 
 	request := make(chan interface{})
 	client(ctx, request)
 
-	request <- 1
-	respond <- 1
+	request <- 1 // send request
+	respond <- 1 // send response
 
+	<-respond    // response sent
+	<-request    // headers received
+	request <- 1 // read body
+	<-request    // body read
+	cancel_req()
 }
 
 func server(respond chan interface{}) {
@@ -27,6 +31,7 @@ func server(respond chan interface{}) {
 		<-respond
 		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
 		log.Print("response sent")
+		respond <- 1
 	})
 	log.Print("handler registered")
 	go func() {
@@ -45,10 +50,16 @@ func client(ctx context.Context, request chan interface{}) {
 		<-request
 		log.Print("sending request")
 		res, err := client.Do(req)
-		log.Print("request sent")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal("request failed ", err)
 		}
-		log.Print("response received", res)
+		log.Print("response headers received")
+		request <- 1
+
+		log.Print("reading body")
+		<-request
+		log.Print("response: ", res)
+		request <- 1
+		log.Print("client done")
 	}()
 }
