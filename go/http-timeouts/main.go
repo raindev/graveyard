@@ -20,9 +20,11 @@ func main() {
 
 	<-respond    // response sent
 	<-request    // headers received
+	// Q: why cancellation before reading body doesn't trigger an error?
+	cancel_req()
+	log.Print("cancelled request")
 	request <- 1 // read body
 	<-request    // body read
-	cancel_req()
 }
 
 func server(respond chan interface{}) {
@@ -56,8 +58,8 @@ func client(ctx context.Context, request chan interface{}) {
 		log.Print("response headers received")
 		request <- 1
 
-		log.Print("reading body")
 		<-request
+		log.Print("reading body")
 		log.Print("response: ", res)
 		request <- 1
 		log.Print("client done")
