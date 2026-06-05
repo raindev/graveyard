@@ -29,8 +29,13 @@ void shellsort(int v[], int n)
 {
 	int gap, i, j, temp;
 
+	// gap from half of length down to 1
 	for (gap = n/2; gap > 0; gap /= 2)
+		// i from gap to the last
 		for (i = gap; i < n; i++)
+			// j start at [0; n - gap)
+			// while element below the one across the gap
+			// swap elements and jump left by gap
 			for (j = i - gap; j >= 0 && v[j] > v [j + gap]; j -= gap) {
 				temp = v[j];
 				v[j] = v[j + gap];
