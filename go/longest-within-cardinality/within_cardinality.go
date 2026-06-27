@@ -3,23 +3,20 @@ package within_cardinality
 // Find the length of the longest stubstring of s within k.
 func longest(s string, k int) int {
 	start := 0
-	counts := make(map[byte]int) // todo use a counter array
+	var counts[256]int
+	cardinality := 0
 	res := 0
 	for end := range s {
-		count := counts[s[end]]
-		counts[s[end]] = count + 1
-		for len(counts) > k {
-			// todo is it possible to update a map value in one lookup?
-			count = counts[s[start]] - 1
-			// todo does go have increments?
-			if count == 0 {
-				delete(counts, s[start])
-			} else {
-				counts[s[start]] = count
-			}
-			start += 1
+		if counts[s[end]] == 0 {
+			cardinality++
 		}
-		// todo does it need to be updated every time?
+		counts[s[end]]++
+		for ; cardinality > k; start++ {
+			counts[s[start]]--
+			if counts[s[start]] == 0 {
+				cardinality--
+			}
+		}
 		res = max(res, end - start + 1)
 	}
 	return res
